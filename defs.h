@@ -143,8 +143,62 @@ struct HunterArray {
     int capacity;
 };
 
+// house helper func.
+void house_init(struct House* house);
+void house_clean(struct House* house);
 
+// room helper func.
 void room_init(struct Room* room, const char* name, bool is_exit);
-void rooms_connect(struct Room* a, struct Room* b); // Bidirectional connection
+void room_addEvidence(struct Room* room, EvidenceByte evidence);
+bool room_addHunter(struct Room* room, struct Hunter* hunter);
+void room_removeHunter(struct Room* room, struct Hunter* hunter);
+void room_connect(struct Room* a, struct Room* b); // Bidirectional connection
+
+
+// roomStack helper func.
+void roomStack_init(struct RoomStack* roomStack);
+void roomStack_push(struct RoomStack* roomStack, struct Room* room);
+struct Room* roomStack_pop(struct RoomStack* roomStack);
+void roomStack_clean(struct RoomStack* roomStack);
+bool roomStack_isEmpty(const struct RoomStack* roomStack);
+
+// hunter helper func.
+void hunter_init(struct Hunter* hunter, const char* name, int id, struct Room* startRoom, struct CaseFile* caseFile, enum EvidenceType device);
+void hunter_updateState(struct Hunter* hunter);
+void hunter_gatherEvidence(struct Hunter* hunter);
+void hunter_move(struct Hunter* hunter, struct Room* destinationRoom);
+void hunter_takeTurn(struct Hunter* hunter);
+void hunter_equipmentSwap(struct Hunter* hunter);
+void hunter_exitRoom(struct Hunter* hunter);
+void* hunter_thread(void* arg);
+
+// hunterArray helper func.
+void hunterArray_init(struct HunterArray* hunterArray);
+bool hunterArray_append(struct HunterArray* hunterArray, struct Hunter* hunter);
+void hunterArray_grow(struct HunterArray* hunterArray);
+void hunterArray_clean(struct HunterArray* hunterArray);
+struct Hunter* hunterArray_get(int index);
+
+// ghost helper func.
+void ghost_init(struct Ghost* ghost, const int id, enum GhostType type, struct Room* startRoom);
+void ghost_move(struct Ghost* ghost, struct Room* destinationRoom);
+void ghost_idle(struct Ghost* ghost);
+void ghost_haunt(struct Ghost* ghost);
+void ghost_takeTurn(struct Ghost* ghost);
+void* ghost_thread(void* arg);
+
+// casefile helper func.
+void casefile_init(struct CaseFile* caseFile);
+void casefile_addEvidence(struct CaseFile* caseFile, enum EvidenceType ev);
+
+// evidence helper func.
+bool evidence_has(EvidenceByte bits, enum EvidenceType ev);
+void evidence_set(EvidenceByte* bits, enum EvidenceType ev);
+void evidence_clear(EvidenceByte* bits, enum EvidenceType ev);
+bool evidence_checkGhost(EvidenceByte bits);
+
+// deadlock helper func.
+void deadlock_lockRooms(struct Room* roomOne, struct Room* roomTwo);
+void deadlock_unlockRooms(struct Room* roomOne, struct Room* roomTwo);
 
 #endif // DEFS_H
