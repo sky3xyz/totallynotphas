@@ -19,7 +19,6 @@
 #define ENTITY_BOREDOM_MAX 15
 #define HUNTER_FEAR_MAX 15
 #define DEFAULT_GHOST_ID 68057
-#define MAX_CAPACITY_HUNTER_BLOCK 5
 
 typedef unsigned char EvidenceByte;
 
@@ -72,23 +71,34 @@ struct CaseFile {
     sem_t        mutex;     // Used for synchronizing both fields when multithreading
 };
 
-// Implement here based on the requirements, should all be allocated to the House structure
+struct House {
+    struct Room rooms[MAX_ROOMS];
+    struct Room* starting_room;
+    struct HunterArray hunters;
+    struct CaseFile casefile;
+    struct Ghost ghost;
+    int room_count;
+};
+
 struct Room {
+    sem_t mutex;
+
     // statics
     char name[MAX_ROOM_NAME];
+    int id;
     EvidenceByte roomEvidence;
     bool exit;
 
     // only accessed by one thread (ghost)
     struct Ghost* currentGhost;
 
-    struct Room* connectedRooms;
+    // connected rooms
+    struct Room* connectedRooms[MAX_CONNECTIONS];
     int connectedRoom_cnt;
-    pthread_mutex_t room_mutex;
 
+    // hunters
     struct Hunter* presentHunters[MAX_ROOM_OCCUPANCY];
     int presentHunters_cnt;
-    pthread_mutex_t hunter_mutex;
 };
 
 struct RoomStack {
@@ -101,10 +111,9 @@ struct RoomNode {
     struct RoomNode *next;
 };
 
-// Implement here based on the requirements, should be allocated to the House structure
 struct Ghost {
     int id;
-    enum GhostType;
+    enum GhostType type;
     struct Room* currentRoom;
     int boredom;
     bool in_simulation;
@@ -113,48 +122,27 @@ struct Ghost {
 struct Hunter {
     char name[MAX_HUNTER_NAME];
     int id;
+
     struct Room* currentRoom_ptr;
     struct CaseFile* caseFile_ptr;
+
     enum EvidenceType currentDevice;
     struct RoomStack path;
+
     int fear;
     int boredom;
     enum LogReason exitReason;
+
+    bool returningToVan;
     bool exitedSimulation;
 };
 
-struct HunterCollection {
-    struct HunterBlock initBlock;
-    int count;
+struct HunterArray {
+    struct Hunter *data;
+    int size;
+    int capacity;
 };
 
-struct HunterBlock {
-    struct HunterNode nodes[MAX_CAPACITY_HUNTER_BLOCK];
-    struct HunterBlock *next;
-    struct HunterBlock *prev;
-    int next_i;
-};
-
-
-struct HunterNode {
-    struct Hunter data;
-    struct HunterNode *prev;
-    struct HunterNode *next;
-};
-
-// Can be either stack or heap allocated
-struct House {
-    struct Room rooms[MAX_ROOMS];
-    struct Room* starting_room; // Needed by house_populate_rooms, but can be adjusted to suit your needs.
-    struct HunterCollection hunters;
-    struct CaseFile *casefile;
-    struct Ghost ghost;
-};
-
-/* The provided `house_populate_rooms()` function requires the following functions.
-   You are free t o rename themand change their parameters and modify house_populate_rooms()
-   as needed as long as the house has the correct rooms and connections after calling it.
-*/
 
 void room_init(struct Room* room, const char* name, bool is_exit);
 void rooms_connect(struct Room* a, struct Room* b); // Bidirectional connection
