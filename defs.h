@@ -4,6 +4,9 @@
 #include <stdbool.h>
 #include <semaphore.h>
 #include <pthread.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
     You are free to rename all of the types and functions defined here.
@@ -75,7 +78,7 @@ struct House {
     struct Room rooms[MAX_ROOMS];
     struct Room* starting_room;
     struct HunterArray hunters;
-    struct CaseFile casefile;
+    struct CaseFile caseFile;
     struct Ghost ghost;
     int room_count;
 };
@@ -153,6 +156,7 @@ void room_addEvidence(struct Room* room, EvidenceByte evidence);
 bool room_addHunter(struct Room* room, struct Hunter* hunter);
 void room_removeHunter(struct Room* room, struct Hunter* hunter);
 void room_connect(struct Room* a, struct Room* b); // Bidirectional connection
+bool room_isFull(struct Room* room);
 
 
 // roomStack helper func.
@@ -180,7 +184,8 @@ void hunterArray_clean(struct HunterArray* hunterArray);
 struct Hunter* hunterArray_get(int index);
 
 // ghost helper func.
-void ghost_init(struct Ghost* ghost, const int id, enum GhostType type, struct Room* startRoom);
+void ghost_init(struct Ghost* ghost);
+    //, const int id, enum GhostType type, struct Room* startRoom);
 void ghost_move(struct Ghost* ghost, struct Room* destinationRoom);
 void ghost_idle(struct Ghost* ghost);
 void ghost_haunt(struct Ghost* ghost);
