@@ -6,7 +6,7 @@ void roomStack_init(struct RoomStack* roomStack) {
 }
 
 int roomStack_push(struct RoomStack* roomStack, struct Room* room) {
-    if (roomStack == NULL) return C_ERR_NULL;
+    if (roomStack == NULL) return C_ERR_EINVAL;
 
     struct RoomNode* roomNode = (struct RoomNode*) calloc(1, sizeof(struct RoomNode));
     if (roomNode == NULL) return C_ERR_ENOMEM;
@@ -15,6 +15,7 @@ int roomStack_push(struct RoomStack* roomStack, struct Room* room) {
     roomNode->next = roomStack->top;
     roomStack->top = roomNode;
     roomStack->count++;
+    return C_ERR_OK;
 }
 
 struct Room* roomStack_pop(struct RoomStack* roomStack) {
@@ -31,11 +32,12 @@ struct Room* roomStack_pop(struct RoomStack* roomStack) {
 }
 
 int roomStack_clear(struct RoomStack* roomStack) {
-    if (roomStack == NULL) return;
+    if (roomStack == NULL) return C_ERR_EINVAL;
 
     while (roomStack->top != NULL) {
         roomStack_pop(roomStack);
     }
+    return C_ERR_OK;
 }
 
 bool roomStack_isEmpty(const struct RoomStack* roomStack) {

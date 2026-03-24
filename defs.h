@@ -14,8 +14,9 @@
 
 
 #define C_ERR_OK 0
-#define C_ERR_ENOMEM 12 // stolen from <errno.h> / errno terminal cmd
-#define C_ERR_NULL
+#define C_ERR_NOT_OK -99
+#define C_ERR_ENOMEM 12 // stolen from errno / man 3 errno -- Cannot allocate memory
+#define C_ERR_EINVAL 22 // stolen from errno / man 3 errno -- Invalid argument
 
 #define MAX_ROOM_NAME 64
 #define MAX_HUNTER_NAME 64

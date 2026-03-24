@@ -22,9 +22,9 @@ void room_init(struct Room* room, const char* name, bool is_exit) {
     }
 }
 
-// void room_addEvidence(struct Room* room, EvidenceByte evidence) {
-//     evidence_set(&room->roomEvidence, evidence);
-// }
+void room_addEvidence(struct Room* room, EvidenceByte evidence) {
+    evidence_set(&room->roomEvidence, evidence);
+}
 
 bool room_addHunter(struct Room* room, struct Hunter* hunter) {
     for (int i = 0; i < MAX_ROOM_OCCUPANCY; i++) {
@@ -37,22 +37,26 @@ bool room_addHunter(struct Room* room, struct Hunter* hunter) {
     return false;
 }
 
-void room_removeHunter(struct Room* room, struct Hunter* hunter) {
+int room_removeHunter(struct Room* room, struct Hunter* hunter) {
     for (int i = 0; i < MAX_ROOM_OCCUPANCY; i++) {
         if (room->presentHunters[i] == hunter) {
             room->presentHunters[i] = NULL;
             room->presentHunters_cnt--;
+            return C_ERR_OK;
         }
     }
+    return C_ERR_NOT_OK;
 }
 
-void room_connect(struct Room* a, struct Room* b) {
+int room_connect(struct Room* a, struct Room* b) {
     if (a->connectedRoom_cnt < MAX_CONNECTIONS && b->connectedRoom_cnt < MAX_CONNECTIONS) {
         a->connectedRooms[a->connectedRoom_cnt++] = b;
         b->connectedRooms[b->connectedRoom_cnt++] = a;
+        return C_ERR_OK;
     }
+    return C_ERR_NOT_OK;
 }
 
 bool room_isFull(struct Room* room) {
-    return (room->presentHunters_cnt) >= MAX_ROOM_OCCUPANCY;
+    return !(room->presentHunters_cnt < MAX_ROOM_OCCUPANCY);
 }
