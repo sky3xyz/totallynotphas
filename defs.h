@@ -3,16 +3,19 @@
 
 #include <stdbool.h>
 #include <semaphore.h>
-#include <pthread.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-
 /*
     You are free to rename all of the types and functions defined here.
 
     The ghost ID must remain the same for the validator to work correctly.
 */
+
+
+#define C_ERR_OK 0
+#define C_ERR_ENOMEM 12 // stolen from <errno.h> / errno terminal cmd
+#define C_ERR_NULL
 
 #define MAX_ROOM_NAME 64
 #define MAX_HUNTER_NAME 64
@@ -154,7 +157,7 @@ struct House {
 
 // house helper func.
 void house_init(struct House* house);
-void house_clean(struct House* house);
+void house_clear(struct House* house);
 
 // room helper func.
 void room_init(struct Room* room, const char* name, bool is_exit);
@@ -167,9 +170,9 @@ bool room_isFull(struct Room* room);
 
 // roomStack helper func.
 void roomStack_init(struct RoomStack* roomStack);
-void roomStack_push(struct RoomStack* roomStack, struct Room* room);
+int roomStack_push(struct RoomStack* roomStack, struct Room* room);
 struct Room* roomStack_pop(struct RoomStack* roomStack);
-void roomStack_clean(struct RoomStack* roomStack);
+int roomStack_clear(struct RoomStack* roomStack);
 bool roomStack_isEmpty(const struct RoomStack* roomStack);
 
 // hunter helper func.
@@ -186,7 +189,7 @@ void* hunter_thread(void* arg);
 void hunterArray_init(struct HunterArray* hunterArray);
 bool hunterArray_append(struct HunterArray* hunterArray, struct Hunter* hunter);
 void hunterArray_grow(struct HunterArray* hunterArray);
-void hunterArray_clean(struct HunterArray* hunterArray);
+void hunterArray_clear(struct HunterArray* hunterArray);
 struct Hunter* hunterArray_get(int index);
 
 // ghost helper func.
@@ -206,7 +209,6 @@ void casefile_addEvidence(struct CaseFile* caseFile, enum EvidenceType ev);
 bool evidence_has(EvidenceByte bits, enum EvidenceType ev);
 void evidence_set(EvidenceByte* bits, enum EvidenceType ev);
 void evidence_clear(EvidenceByte* bits, enum EvidenceType ev);
-bool evidence_checkGhost(EvidenceByte bits);
 
 // deadlock helper func.
 void deadlock_lockRooms(struct Room* roomOne, struct Room* roomTwo);

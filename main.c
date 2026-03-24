@@ -39,6 +39,6 @@ int test(void) {
         printf("\n");
     }
 
-    house_clean(&house);
+    house_clear(&house);
     return 0;
 }

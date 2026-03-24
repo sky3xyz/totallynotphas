@@ -10,7 +10,7 @@ void house_init(struct House* house) {
     house->room_count = 0;
 }
 
-void house_clean(struct House* house) {
+void house_clear(struct House* house) {
     if (house == NULL) return;
 
     for (int i = 0; i < house->room_count; i++) {
