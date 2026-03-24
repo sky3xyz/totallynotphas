@@ -1,8 +1,11 @@
 CC ?= gcc
-CFLAGS ?= -Wall -Wextra
+HEADERDIR := headers/
+CFLAGS ?= -Wall -Wextra -I$(HEADERDIR)/
+
 LDFLAGS :=
 TARGET := totally_not_phasmophoiba
 
+SRC_DIR := src/
 SRCS := main.c room.c roomStack.c house.c evidence.c helpers.c
 
 # rel default, changes with DEBUG
@@ -14,7 +17,7 @@ MODE := rel
 endif
 
 OBJDIR := obj/$(MODE)
-OBJS := $(patsubst %.c,$(OBJDIR)/%.o,src/$(SRCS))
+OBJS := $(patsubst %.c,$(OBJDIR)/%.o,$(SRCS))
 
 .PHONY: all debug clean
 
@@ -26,7 +29,7 @@ debug:
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) $^ -o $@
 
-$(OBJDIR)/%.o: %.c | $(OBJDIR)
+$(OBJDIR)/%.o: $(SRC_DIR)/%.c | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR):
