@@ -5,7 +5,6 @@
 #include "helpers.h"
 
 int main() {
-
     /*
     1. Initialize a House structure.
     2. Populate the House with rooms using the provided helper function.
