@@ -5,7 +5,7 @@ void room_init(struct Room* room, const char* name, bool is_exit) {
     room->id = roomID++;
 
     sem_init(&(room->mutex), 0, 1);
-    room->roomEvidence = '0b0000000';
+    room->roomEvidence = 0;
     room->exit = is_exit;
     strncpy(room->name, name, MAX_ROOM_NAME - 1);
     room->name[MAX_ROOM_NAME - 1] = '\0';
@@ -22,9 +22,9 @@ void room_init(struct Room* room, const char* name, bool is_exit) {
     }
 }
 
-void room_addEvidence(struct Room* room, EvidenceByte evidence) {
-    evidence_set(&room->roomEvidence, evidence);
-}
+// void room_addEvidence(struct Room* room, EvidenceByte evidence) {
+//     evidence_set(&room->roomEvidence, evidence);
+// }
 
 bool room_addHunter(struct Room* room, struct Hunter* hunter) {
     for (int i = 0; i < MAX_ROOM_OCCUPANCY; i++) {
@@ -54,5 +54,5 @@ void room_connect(struct Room* a, struct Room* b) {
 }
 
 bool room_isFull(struct Room* room) {
-    return (room->presentHunters_cnt < MAX_ROOM_OCCUPANCY);
+    return (room->presentHunters_cnt) >= MAX_ROOM_OCCUPANCY;
 }

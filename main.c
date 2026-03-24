@@ -4,6 +4,8 @@
 #include "defs.h"
 #include "helpers.h"
 
+int test();
+
 int main() {
     /*
     1. Initialize a House structure.
@@ -18,5 +20,28 @@ int main() {
     7. Clean up all dynamically allocated resources and call sem_destroy() on all semaphores.
     */
 
+    return test();
+}
+
+int test(void) {
+    struct House house;
+
+    house_init(&house);
+    house_populate_rooms(&house);
+
+    printf("Starting room: %s\n\n",
+           house.starting_room ? house.starting_room->name : "NULL");
+
+    for (int i = 0; i < house.room_count; i++) {
+        printf("%s\n", house.rooms[i].name);
+
+        for (int j = 0; j < house.rooms[i].connectedRoom_cnt; j++) {
+            printf("   %s\n", house.rooms[i].connectedRooms[j]->name);
+        }
+
+        printf("\n");
+    }
+
+    house_clean(&house);
     return 0;
 }

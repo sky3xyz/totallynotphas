@@ -24,6 +24,11 @@
 #define DEFAULT_GHOST_ID 68057
 
 typedef unsigned char EvidenceByte;
+struct Room;
+struct RoomNode;
+struct Ghost;
+struct Hunter;
+struct HunterArray;
 
 enum LogReason {
     LR_EVIDENCE = 0,
@@ -74,44 +79,14 @@ struct CaseFile {
     sem_t        mutex;     // Used for synchronizing both fields when multithreading
 };
 
-struct House {
-    struct Room rooms[MAX_ROOMS];
-    struct Room* starting_room;
-    struct HunterArray hunters;
-    struct CaseFile caseFile;
-    struct Ghost ghost;
-    int room_count;
-};
-
-struct Room {
-    sem_t mutex;
-
-    // statics
-    char name[MAX_ROOM_NAME];
-    int id;
-    EvidenceByte roomEvidence;
-    bool exit;
-
-    // only accessed by one thread (ghost)
-    struct Ghost* currentGhost;
-
-    // connected rooms
-    struct Room* connectedRooms[MAX_CONNECTIONS];
-    int connectedRoom_cnt;
-
-    // hunters
-    struct Hunter* presentHunters[MAX_ROOM_OCCUPANCY];
-    int presentHunters_cnt;
+struct RoomNode {
+    struct Room *room;
+    struct RoomNode *next;
 };
 
 struct RoomStack {
     struct RoomNode *top;
     int count;
-};
-
-struct RoomNode {
-    struct Room *room;
-    struct RoomNode *next;
 };
 
 struct Ghost {
@@ -145,6 +120,37 @@ struct HunterArray {
     int size;
     int capacity;
 };
+
+struct Room {
+    sem_t mutex;
+
+    // statics
+    char name[MAX_ROOM_NAME];
+    int id;
+    EvidenceByte roomEvidence;
+    bool exit;
+
+    // only accessed by one thread (ghost)
+    struct Ghost* currentGhost;
+
+    // connected rooms
+    struct Room* connectedRooms[MAX_CONNECTIONS];
+    int connectedRoom_cnt;
+
+    // hunters
+    struct Hunter* presentHunters[MAX_ROOM_OCCUPANCY];
+    int presentHunters_cnt;
+};
+
+struct House {
+    struct Room rooms[MAX_ROOMS];
+    struct Room* starting_room;
+    struct HunterArray hunters;
+    struct CaseFile caseFile;
+    struct Ghost ghost;
+    int room_count;
+};
+
 
 // house helper func.
 void house_init(struct House* house);
