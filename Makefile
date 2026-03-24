@@ -3,7 +3,7 @@ CFLAGS ?= -Wall -Wextra
 LDFLAGS :=
 TARGET := totally_not_phasmophoiba
 
-SRCS := main.c room.c roomStack.c house.c evidence.c
+SRCS := main.c room.c roomStack.c house.c evidence.c helpers.c
 
 # rel default, changes with DEBUG
 ifeq ($(DEBUG),1)
@@ -14,7 +14,7 @@ MODE := rel
 endif
 
 OBJDIR := obj/$(MODE)
-OBJS := $(patsubst %.c,$(OBJDIR)/%.o,$(SRCS))
+OBJS := $(patsubst %.c,$(OBJDIR)/%.o,src/$(SRCS))
 
 .PHONY: all debug clean
 

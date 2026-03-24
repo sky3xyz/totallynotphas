@@ -1,5 +1,6 @@
 #include "defs.h"
 #include "helpers.h"
+#include <stdio.h>
 
 int test();
 

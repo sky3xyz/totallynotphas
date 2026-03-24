@@ -164,8 +164,8 @@ void house_clear(struct House* house);
 void room_init(struct Room* room, const char* name, bool is_exit);
 void room_addEvidence(struct Room* room, EvidenceByte evidence);
 bool room_addHunter(struct Room* room, struct Hunter* hunter);
-void room_removeHunter(struct Room* room, struct Hunter* hunter);
-void room_connect(struct Room* a, struct Room* b); // Bidirectional connection
+int room_removeHunter(struct Room* room, struct Hunter* hunter);
+int room_connect(struct Room* a, struct Room* b); // Bidirectional connection
 bool room_isFull(struct Room* room);
 
 
