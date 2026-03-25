@@ -120,7 +120,7 @@ struct Hunter {
 };
 
 struct HunterArray {
-    struct Hunter *data;
+    struct Hunter* data;
     int size;
     int capacity;
 };
@@ -158,6 +158,7 @@ struct House {
 
 // house helper func.
 void house_init(struct House* house);
+struct Room* house_getRndRoom(struct House* house);
 void house_clear(struct House* house);
 
 // room helper func.
@@ -194,7 +195,8 @@ void hunterArray_clear(struct HunterArray* hunterArray);
 struct Hunter* hunterArray_get(int index);
 
 // ghost helper func.
-void ghost_init(struct Ghost* ghost);
+enum GhostType ghost_randomGhostType();
+void ghost_init(struct Ghost* ghost, struct House* house);
     //, const int id, enum GhostType type, struct Room* startRoom);
 void ghost_move(struct Ghost* ghost, struct Room* destinationRoom);
 void ghost_idle(struct Ghost* ghost);
@@ -210,9 +212,13 @@ void casefile_addEvidence(struct CaseFile* caseFile, enum EvidenceType ev);
 bool evidence_has(EvidenceByte bits, enum EvidenceType ev);
 void evidence_set(EvidenceByte* bits, enum EvidenceType ev);
 void evidence_clear(EvidenceByte* bits, enum EvidenceType ev);
+/* from helpers.h
+bool evidence_is_valid_ghost(EvidenceByte mask);
+*/
 
-// deadlock helper func.
-void deadlock_lockRooms(struct Room* roomOne, struct Room* roomTwo);
-void deadlock_unlockRooms(struct Room* roomOne, struct Room* roomTwo);
+// deadlock prevention helper func.
+int deadlock_lockRooms(struct Room* roomOne, struct Room* roomTwo);
+int deadlock_unlockRooms(struct Room* roomOne, struct Room* roomTwo);
+static bool deadlock_whoFirst(const struct Room* roomOne, const struct Room* roomTwo);
 
 #endif // DEFS_H

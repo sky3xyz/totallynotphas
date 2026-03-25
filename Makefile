@@ -5,8 +5,8 @@ CFLAGS ?= -Wall -Wextra -I$(HEADERDIR)/
 LDFLAGS :=
 TARGET := totally_not_phasmophoiba
 
-SRC_DIR := src/
-SRCS := main.c room.c roomStack.c house.c evidence.c helpers.c
+SRC_DIR := src
+SRCS := $(wildcard src/*.c)
 
 # rel default, changes with DEBUG
 ifeq ($(DEBUG),1)
@@ -17,7 +17,7 @@ MODE := rel
 endif
 
 OBJDIR := obj/$(MODE)
-OBJS := $(patsubst %.c,$(OBJDIR)/%.o,$(SRCS))
+OBJS := $(patsubst $(SRC_DIR)%.c,$(OBJDIR)/%.o,$(SRCS))
 
 .PHONY: all debug clean
 
