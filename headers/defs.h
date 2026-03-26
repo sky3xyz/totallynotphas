@@ -15,8 +15,8 @@
 
 #define C_ERR_OK 0
 #define C_ERR_NOT_OK -99
-#define C_ERR_ENOMEM 12 // stolen from errno / man 3 errno -- Cannot allocate memory
-#define C_ERR_EINVAL 22 // stolen from errno / man 3 errno -- Invalid argument
+#define C_ERR_ENOMEM 12 // stolen from errno cmd / man 3 errno -- Cannot allocate memory
+#define C_ERR_EINVAL 22 // stolen from errno cmd / man 3 errno -- Invalid argument
 
 #define MAX_ROOM_NAME 64
 #define MAX_HUNTER_NAME 64
@@ -78,9 +78,9 @@ enum GhostType {
 };
 
 enum GhostAction {
-    IDLE=0,
-    HAUNT=1,
-    MOVE=2
+    GA_IDLE=0,
+    GA_HAUNT=1,
+    GA_MOVE=2
 };
 
 struct CaseFile {
@@ -127,7 +127,7 @@ struct Hunter {
 
 struct HunterArray {
     struct Hunter* data;
-    int size;
+    int contains;
     int capacity;
 };
 
@@ -195,10 +195,10 @@ void* hunter_thread(void* arg);
 
 // hunterArray helper func.
 void hunterArray_init(struct HunterArray* hunterArray);
-bool hunterArray_append(struct HunterArray* hunterArray, struct Hunter* hunter);
-void hunterArray_grow(struct HunterArray* hunterArray);
-void hunterArray_clear(struct HunterArray* hunterArray);
-struct Hunter* hunterArray_get(int index);
+int hunterArray_append(struct HunterArray* hunterArray, struct Hunter* hunter);
+int hunterArray_grow(struct HunterArray* hunterArray);
+int hunterArray_clear(struct HunterArray* hunterArray);
+int hunterArray_canAppend(struct HunterArray* hunterArray);
 
 // ghost helper func.
 enum GhostType ghost_randomGhostType();

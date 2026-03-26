@@ -36,4 +36,4 @@ $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
 clean:
-	rm -rf obj $(TARGET)
+	rm -rf obj $(TARGET) log_*.csv vgcore.*

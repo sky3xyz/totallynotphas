@@ -136,15 +136,15 @@ void ghost_takeTurn(struct Ghost* ghost) {
     enum GhostAction selectedAction = (enum GhostAction)rand_int_threadsafe(0, upperBound_actions);
 
     switch (selectedAction) {
-        case IDLE:
+        case GA_IDLE:
             ghost_idle(ghost);
             return;
 
-        case HAUNT:
+        case GA_HAUNT:
             ghost_haunt(ghost);
             return;
 
-        case MOVE: {
+        case GA_MOVE: {
             struct Room *destination = neighbors[rand_int_threadsafe(0, neighborCount-1)];
             ghost_move(ghost, destination);
             return;

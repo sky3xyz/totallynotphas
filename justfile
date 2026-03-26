@@ -11,6 +11,7 @@ debug-build:
     make debug
 
 commit message:
+    make clean
     git add -A
     git commit -m "{{message}}"
 
