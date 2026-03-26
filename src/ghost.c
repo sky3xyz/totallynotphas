@@ -83,10 +83,15 @@ void ghost_haunt(struct Ghost* ghost) {
 
 void ghost_takeTurn(struct Ghost* ghost) {
     fprintf(stderr, "[INFO] GHOST TOOK TURN\n");
-    if (ghost == NULL || ghost->currentRoom == NULL) {
+    if (ghost == NULL) {
         fprintf(stderr, "[ERROR] GHOST NULL\n");
         return;
     };
+
+    if(ghost->currentRoom == NULL) {
+        fprintf(stderr, "[WARN] GHOST NOT IN ANY ROOM\n");
+        return;
+    }
 
     if (!ghost->in_simulation) {
         fprintf(stderr, "[INFO] GHOST NOT IN SIMULATION\n");
