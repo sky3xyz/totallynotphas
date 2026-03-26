@@ -1,6 +1,7 @@
 #include "defs.h"
 #include "helpers.h"
 #include <unistd.h>
+#include <stdio.h>
 
 void ghost_init(struct Ghost* ghost, struct House* house) {
     static int ghostID = DEFAULT_GHOST_ID;
@@ -14,6 +15,7 @@ void ghost_init(struct Ghost* ghost, struct House* house) {
     sem_wait(&initRoom->mutex);
     ghost->currentRoom = initRoom;
     initRoom->currentGhost = ghost;
+    log_ghost_init(ghost->id, ghost->currentRoom->name, ghost->type);
     sem_post(&initRoom->mutex);
 }
 
@@ -50,6 +52,7 @@ void ghost_move(struct Ghost* ghost, struct Room* destinationRoom) {
 }
 
 void ghost_idle(struct Ghost* ghost) {
+    log_ghost_idle(ghost->id, ghost->boredom, ghost->currentRoom->name);  
     usleep(rand_int_threadsafe(5000, 15000));
     (void)ghost; // use parameter to avoid warning
 }
@@ -71,13 +74,24 @@ void ghost_haunt(struct Ghost* ghost) {
     }
 
     if (cnt > 0) {
-        room_addEvidence(ghost->currentRoom, options[rand_int_threadsafe(0, cnt - 1)]);
+        int evidenceI = rand_int_threadsafe(0, cnt - 1);
+        room_addEvidence(ghost->currentRoom, options[evidenceI]);
+        log_ghost_evidence(ghost->id, ghost->boredom, ghost->currentRoom->name, options[evidenceI]);
     }
 }
 
 
 void ghost_takeTurn(struct Ghost* ghost) {
-    if (ghost == NULL || !ghost->in_simulation || ghost->currentRoom == NULL) return;
+    fprintf(stderr, "[INFO] GHOST TOOK TURN\n");
+    if (ghost == NULL || ghost->currentRoom == NULL) {
+        fprintf(stderr, "[ERROR] GHOST NULL\n");
+        return;
+    };
+
+    if (!ghost->in_simulation) {
+        fprintf(stderr, "[INFO] GHOST NOT IN SIMULATION\n");
+        return;
+    }
 
     // take "snapshot" and quickly release the mutex
     struct Room *currentRoom = ghost->currentRoom;
@@ -99,9 +113,11 @@ void ghost_takeTurn(struct Ghost* ghost) {
         sem_wait(&currentRoom->mutex);
 
         if (currentRoom->currentGhost == ghost && currentRoom->presentHunters_cnt == 0) {
+            char* prevRoom = currentRoom->name;
             currentRoom->currentGhost = NULL;
             ghost->currentRoom = NULL;
             ghost->in_simulation = false;
+            log_ghost_exit(ghost->id, ghost->boredom, prevRoom);
         } else if (currentRoom->presentHunters_cnt > 0) {
             ghost->boredom = 0;
         }
@@ -130,6 +146,7 @@ void ghost_takeTurn(struct Ghost* ghost) {
         }
 
         default:
+            fprintf(stderr, "[WARN] DEFAULT CASE ON SWITCH\n");
             ghost_idle(ghost);
             return;
     }
@@ -147,6 +164,7 @@ bool ghost_updateCheckBoredom(struct Ghost* ghost, int hunterCount) {
 
 
 void* ghost_thread(void* arg) {
+    fprintf(stderr, "[INFO] GHOST THREAD STARTED\n");
     struct Ghost *ghost = arg;
     if (ghost == NULL) return NULL;
 

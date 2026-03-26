@@ -1,4 +1,5 @@
 #include "defs.h"
+#include <stdio.h>
 
 void room_init(struct Room* room, const char* name, bool is_exit) {
     static int roomID = 0;
@@ -33,9 +34,11 @@ bool room_addHunter(struct Room* room, struct Hunter* hunter) {
         if (room->presentHunters[i] == NULL) {
             room->presentHunters[i] = hunter;
             room->presentHunters_cnt++;
+            fprintf(stderr, "[INFO] HUNTER ADDED TO ROOM\n");
             return true;
         }
     }
+    fprintf(stderr, "[ERROR] HUNTER UNABLE TO BE ADDED TO ROOM\n");
     return false;
 }
 
@@ -44,9 +47,11 @@ int room_removeHunter(struct Room* room, struct Hunter* hunter) {
         if (room->presentHunters[i] == hunter) {
             room->presentHunters[i] = NULL;
             room->presentHunters_cnt--;
+            fprintf(stderr, "[INFO] HUNTER REMOVED FROM ROOM\n");
             return C_ERR_OK;
         }
     }
+    fprintf(stderr, "[ERROR] HUNTER UNABLE TO BE REMOVED FROM ROOM\n");
     return C_ERR_NOT_OK;
 }
 

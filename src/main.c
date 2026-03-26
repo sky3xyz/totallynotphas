@@ -22,25 +22,24 @@ int main() {
 }
 
 int test(void) {
+    fprintf(stderr, "\n");
     struct House house;
 
     house_init(&house);
     house_populate_rooms(&house);
     ghost_init(&house.ghost, &house);
 
-    printf("Starting room: %s\n\n",
-           house.starting_room ? house.starting_room->name : "NULL");
+    printf("Starting room: %s\n\n", house.starting_room ? house.starting_room->name : "NULL");
+    printf("%s %d\n\n", "# of Rooms: ", house.room_count);
 
     for (int i = 0; i < house.room_count; i++) {
-        printf("%s\n", house.rooms[i].name);
-        printf("%d\n", house.room_count);
+        printf("%s %s\n", "In Room:", house.rooms[i].name);
+        printf("%s %d\n", "Connected Rooms:", house.room_count);
 
         for (int j = 0; j < house.rooms[i].connectedRoom_cnt; j++) {
-            printf("%5s\n", house.rooms[i].connectedRooms[j]->name);
-            printf("%5d\n", house.rooms[i].connectedRoom_cnt);
+            printf("%5s %s\n", "-", house.rooms[i].connectedRooms[j]->name);
         }
-
-        printf("\n\n\n");
+        printf("\n");
     }
 
     for (int i = 0; i < 5; i++) {

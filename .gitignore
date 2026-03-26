@@ -1,2 +1,4 @@
 totally_not_phasmophoiba
 obj/
+vgcore.*
+log_*.csv
