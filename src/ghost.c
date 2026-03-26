@@ -35,7 +35,7 @@ void ghost_move(struct Ghost* ghost, struct Room* destinationRoom) {
 
     deadlock_lockRooms(currentRoom, destinationRoom);
 
-    if (currentRoom->presentHunters_cnt != 0) {
+    if (ghost->currentRoom != currentRoom || currentRoom->currentGhost != ghost || currentRoom->presentHunters_cnt != 0) {
         deadlock_unlockRooms(currentRoom, destinationRoom);
         ghost_idle(ghost);
         return;
@@ -50,7 +50,7 @@ void ghost_move(struct Ghost* ghost, struct Room* destinationRoom) {
 }
 
 void ghost_idle(struct Ghost* ghost) {
-    usleep(rand_int_threadsafe(5, 15));
+    usleep(rand_int_threadsafe(5000, 15000));
     (void)ghost; // use parameter to avoid warning
 }
 
@@ -81,7 +81,7 @@ void ghost_takeTurn(struct Ghost* ghost) {
 
     // take "snapshot" and quickly release the mutex
     struct Room *currentRoom = ghost->currentRoom;
-    struct Room *neighbors[MAX_CONNECTIONS] = ghost->currentRoom;
+    struct Room *neighbors[MAX_CONNECTIONS] = {0};
     int hunterCount = 0;
     int neighborCount = 0;
 
@@ -95,18 +95,23 @@ void ghost_takeTurn(struct Ghost* ghost) {
     sem_post(&currentRoom->mutex);
 
     // ghost is bored
-    if (ghost_updateCheckBoredom(ghost, hunterCount) && ghost->boredom >= ENTITY_BOREDOM_MAX) {
+    if (ghost_updateCheckBoredom(ghost, hunterCount)) {
         sem_wait(&currentRoom->mutex);
-        if (currentRoom->currentGhost == ghost) currentRoom->currentGhost = NULL;
-        sem_post(&currentRoom->mutex);
 
-        ghost->currentRoom = NULL;
-        ghost->in_simulation = false;
+        if (currentRoom->currentGhost == ghost && currentRoom->presentHunters_cnt == 0) {
+            currentRoom->currentGhost = NULL;
+            ghost->currentRoom = NULL;
+            ghost->in_simulation = false;
+        } else if (currentRoom->presentHunters_cnt > 0) {
+            ghost->boredom = 0;
+        }
+
+        sem_post(&currentRoom->mutex);
         return;
     }
 
     int upperBound_actions = 3;
-    if (hunterCount > 0) upperBound_actions = 2;
+    if (hunterCount > 0 || neighborCount == 0) upperBound_actions = 2;
     enum GhostAction selectedAction = (enum GhostAction)rand_int_threadsafe(0, upperBound_actions);
 
     switch (selectedAction) {
@@ -141,4 +146,13 @@ static bool ghost_updateCheckBoredom(struct Ghost* ghost, int hunterCount) {
 }
 
 
-void* ghost_thread(void* arg);
+void* ghost_thread(void* arg) {
+    struct Ghost *ghost = arg;
+    if (ghost == NULL) return NULL;
+
+    while (ghost->in_simulation) {
+        ghost_takeTurn(ghost);
+        usleep(rand_int_threadsafe(5000, 15000));
+    }
+    return NULL;
+}

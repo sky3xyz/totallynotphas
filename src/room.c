@@ -23,7 +23,9 @@ void room_init(struct Room* room, const char* name, bool is_exit) {
 }
 
 void room_addEvidence(struct Room* room, EvidenceByte evidence) {
+    sem_wait(&room->mutex);
     evidence_set(&room->roomEvidence, evidence);
+    sem_post(&room->mutex);
 }
 
 bool room_addHunter(struct Room* room, struct Hunter* hunter) {
