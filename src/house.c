@@ -1,5 +1,6 @@
 #include "defs.h"
 #include "helpers.h"
+#include <stddef.h>
 
 void house_init(struct House* house) {
     if (house == NULL) return;

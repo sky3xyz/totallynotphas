@@ -1,4 +1,6 @@
 #include "defs.h"
+#include <stddef.h>
+#include <stdlib.h>
 
 void roomStack_init(struct RoomStack* roomStack) {
     roomStack->top = NULL;

@@ -1,11 +1,8 @@
 #ifndef DEFS_H
 #define DEFS_H
-
-#include <stdbool.h>
 #include <semaphore.h>
 #include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
+
 /*
     You are free to rename all of the types and functions defined here.
 
@@ -194,7 +191,7 @@ void hunter_exitRoom(struct Hunter* hunter);
 void* hunter_thread(void* arg);
 
 // hunterArray helper func.
-void hunterArray_init(struct HunterArray* hunterArray);
+int hunterArray_init(struct HunterArray* hunterArray);
 int hunterArray_append(struct HunterArray* hunterArray, struct Hunter* hunter);
 int hunterArray_grow(struct HunterArray* hunterArray);
 int hunterArray_clear(struct HunterArray* hunterArray);

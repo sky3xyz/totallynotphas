@@ -1,5 +1,6 @@
 #include "defs.h"
 #include <stdio.h>
+#include <string.h>
 
 void room_init(struct Room* room, const char* name, bool is_exit) {
     static int roomID = 0;
