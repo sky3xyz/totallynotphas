@@ -3,7 +3,7 @@
 #include <string.h>
 // my favorite valorant agent
 
-static bool deadlock_whoFirst(const struct Room* roomOne, const struct Room* roomTwo) {
+bool deadlock_whoFirst(const struct Room* roomOne, const struct Room* roomTwo) {
     if (roomOne->id != roomTwo->id) return (roomOne->id > roomTwo->id);
 
     // tie breaker -- compare size (not length) of room name

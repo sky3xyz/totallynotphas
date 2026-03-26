@@ -4,7 +4,7 @@ void room_init(struct Room* room, const char* name, bool is_exit) {
     static int roomID = 0;
     room->id = roomID++;
 
-    sem_init(&(room->mutex), 0, 1);
+    sem_init((&room->mutex), 0, 1);
     room->roomEvidence = 0;
     room->exit = is_exit;
     strncpy(room->name, name, MAX_ROOM_NAME - 1);

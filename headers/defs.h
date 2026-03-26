@@ -219,6 +219,6 @@ bool evidence_is_valid_ghost(EvidenceByte mask);
 // deadlock prevention helper func.
 int deadlock_lockRooms(struct Room* roomOne, struct Room* roomTwo);
 int deadlock_unlockRooms(struct Room* roomOne, struct Room* roomTwo);
-static bool deadlock_whoFirst(const struct Room* roomOne, const struct Room* roomTwo);
+bool deadlock_whoFirst(const struct Room* roomOne, const struct Room* roomTwo);
 
 #endif // DEFS_H

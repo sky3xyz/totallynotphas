@@ -26,6 +26,7 @@ int test(void) {
 
     house_init(&house);
     house_populate_rooms(&house);
+    ghost_init(&house.ghost, &house);
 
     printf("Starting room: %s\n\n",
            house.starting_room ? house.starting_room->name : "NULL");
