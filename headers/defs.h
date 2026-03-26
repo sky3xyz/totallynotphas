@@ -77,6 +77,12 @@ enum GhostType {
     GH_SPIRIT       = EV_WRITING      | EV_RADIO       | EV_EMF,
 };
 
+enum GhostAction {
+    IDLE=0,
+    HAUNT=1,
+    MOVE=2
+};
+
 struct CaseFile {
     EvidenceByte collected; // Union of all of the evidence bits collected between all hunters
     bool         solved;    // True when >=3 unique bits set
