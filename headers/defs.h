@@ -209,6 +209,7 @@ void ghost_idle(struct Ghost* ghost);
 void ghost_haunt(struct Ghost* ghost);
 void ghost_takeTurn(struct Ghost* ghost);
 void* ghost_thread(void* arg);
+bool ghost_updateCheckBoredom(struct Ghost* ghost, int hunterConut);
 
 // casefile helper func.
 void casefile_init(struct CaseFile* caseFile);

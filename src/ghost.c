@@ -135,7 +135,7 @@ void ghost_takeTurn(struct Ghost* ghost) {
     }
 }
 
-static bool ghost_updateCheckBoredom(struct Ghost* ghost, int hunterCount) {
+bool ghost_updateCheckBoredom(struct Ghost* ghost, int hunterCount) {
     if (hunterCount > 0) {
         ghost->boredom = 0;
     } else {

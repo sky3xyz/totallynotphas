@@ -33,12 +33,18 @@ int test(void) {
 
     for (int i = 0; i < house.room_count; i++) {
         printf("%s\n", house.rooms[i].name);
+        printf("%d\n", house.room_count);
 
         for (int j = 0; j < house.rooms[i].connectedRoom_cnt; j++) {
-            printf("   %s\n", house.rooms[i].connectedRooms[j]->name);
+            printf("%5s\n", house.rooms[i].connectedRooms[j]->name);
+            printf("%5d\n", house.rooms[i].connectedRoom_cnt);
         }
 
-        printf("\n");
+        printf("\n\n\n");
+    }
+
+    for (int i = 0; i < 5; i++) {
+        ghost_takeTurn(&house.ghost);
     }
 
     house_clear(&house);

@@ -38,12 +38,12 @@ int deadlock_unlockRooms(struct Room* roomOne, struct Room* roomTwo) {
     if (roomOne == NULL || roomTwo == NULL) return C_ERR_EINVAL;
     
     if (roomOne == roomTwo) {
-        sem_wait(&roomOne->mutex);
+        sem_post(&roomOne->mutex);
         return C_ERR_OK;
     }
 
-    struct Room *firstRoom;
-    struct Room *secondRoom;
+    struct Room *firstRoom = roomOne;
+    struct Room *secondRoom = roomTwo;
 
     if (!deadlock_whoFirst(roomOne, roomTwo)) {
         firstRoom = roomTwo;
