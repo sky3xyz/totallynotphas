@@ -1,8 +1,8 @@
 CC ?= gcc
 HEADERDIR := headers/
-CFLAGS ?= -Wall -Wextra -I$(HEADERDIR)/
+CFLAGS ?= -I$(HEADERDIR) -Wall -Wextra 
 
-LDFLAGS :=
+LDFLAGS := 
 TARGET := totally_not_phasmophoiba
 
 SRC_DIR := src
@@ -17,7 +17,7 @@ MODE := rel
 endif
 
 OBJDIR := obj/$(MODE)
-OBJS := $(patsubst $(SRC_DIR)%.c,$(OBJDIR)/%.o,$(SRCS))
+OBJS := $(patsubst $(SRC_DIR)%.c,$(OBJDIR)%.o,$(SRCS))
 
 .PHONY: all debug clean
 
@@ -29,7 +29,7 @@ debug:
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) $^ -o $@
 
-$(OBJDIR)/%.o: $(SRC_DIR)/%.c | $(OBJDIR)
+$(OBJDIR)%.o: $(SRC_DIR)%.c | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR):

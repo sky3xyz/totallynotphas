@@ -31,9 +31,8 @@ void casefile_addEvidence(struct CaseFile* caseFile, enum EvidenceType ev) {
         return;
     }
 
-    EvidenceByte before = caseFile->collected;
     evidence_set(&caseFile->collected, ev);
-    if (evidence_has_three_unique(&caseFile->collected) && evidence_is_valid_ghost(&caseFile->collected)) {
+    if (evidence_is_valid_ghost(caseFile->collected)) {
         caseFile->solved = true;
     }
 

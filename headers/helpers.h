@@ -53,12 +53,12 @@ int rand_int_threadsafe(int lower_inclusive, int upper_exclusive);
  */
 bool evidence_is_valid_ghost(EvidenceByte mask);
 
-/**
- * @brief Check whether at least three unique evidence bits are set.
- * @param[in] mask Evidence bitmask to inspect.
- * @return true when three or more distinct bits are set.
- */
-bool evidence_has_three_unique(EvidenceByte mask);
+// /**
+//  * @brief Check whether at least three unique evidence bits are set.
+//  * @param[in] mask Evidence bitmask to inspect.
+//  * @return true when three or more distinct bits are set.
+//  */
+// bool evidence_has_three_unique(EvidenceByte mask);
 
 /**
  * @brief Populate the house structure with the Willow layout.
