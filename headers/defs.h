@@ -1,5 +1,6 @@
 #ifndef DEFS_H
 #define DEFS_H
+// shared libraries between all files
 #include <semaphore.h>
 #include <stdbool.h>
 
@@ -11,6 +12,7 @@
 
 
 #define C_ERR_OK 0
+#define C_ERR_NO_EVIDENCE 14
 #define C_ERR_NOT_OK -99
 #define C_ERR_ENOMEM 12 // stolen from errno cmd / man 3 errno -- Cannot allocate memory
 #define C_ERR_EINVAL 22 // stolen from errno cmd / man 3 errno -- Invalid argument
@@ -23,6 +25,7 @@
 #define ENTITY_BOREDOM_MAX 15
 #define HUNTER_FEAR_MAX 15
 #define DEFAULT_GHOST_ID 68057
+#define INITAL_HUNTER_ID 22001
 
 typedef unsigned char EvidenceByte;
 struct Room;
@@ -108,7 +111,7 @@ struct Hunter {
     char name[MAX_HUNTER_NAME];
     int id;
 
-    struct Room* currentRoom_ptr;
+    struct Room* currentRoom;
     struct CaseFile* caseFile_ptr;
 
     enum EvidenceType currentDevice;
@@ -183,7 +186,7 @@ bool roomStack_isEmpty(const struct RoomStack* roomStack);
 // hunter helper func.
 void hunter_init(struct Hunter* hunter, const char* name, int id, struct Room* startRoom, struct CaseFile* caseFile, enum EvidenceType device);
 void hunter_updateState(struct Hunter* hunter);
-void hunter_gatherEvidence(struct Hunter* hunter);
+int hunter_gatherEvidence(struct Hunter* hunter);
 void hunter_move(struct Hunter* hunter, struct Room* destinationRoom);
 void hunter_takeTurn(struct Hunter* hunter);
 void hunter_equipmentSwap(struct Hunter* hunter);

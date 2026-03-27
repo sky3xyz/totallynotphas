@@ -11,7 +11,7 @@ int hunterArray_init(struct HunterArray *hunterArray) {
 
     hunterArray->contains = 0;
     hunterArray->capacity = 1;
-    hunterArray->data = calloc(hunterArray->capacity, sizeof(*hunterArray->data));
+    hunterArray->data = (struct Hunter*) calloc(hunterArray->capacity, sizeof(*hunterArray->data));
 
     if (hunterArray->data == NULL) {
         fprintf(stderr, "[ERROR] hunterArray_init: hunterArray calloc failed\n");
@@ -81,7 +81,6 @@ int hunterArray_grow(struct HunterArray *hunterArray) {
     fprintf(stderr, "[INFO] hunterArray_grow: hunterArray grew to %d\n", newCapacity);
     return C_ERR_OK;
 }
-
 
 int hunterArray_clear(struct HunterArray *hunterArray) {
     if (hunterArray == NULL) {

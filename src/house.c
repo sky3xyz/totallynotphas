@@ -6,8 +6,8 @@ void house_init(struct House* house) {
     if (house == NULL) return;
 
     house->starting_room = NULL;
-    // hunterArray_init(&house->hunters);
-    // casefile_init(&house->caseFile);
+    hunterArray_init(&house->hunters);
+    casefile_init(&house->caseFile);
     house->room_count = 0;
 }
 
@@ -27,6 +27,7 @@ void house_clear(struct House* house) {
         sem_destroy(&house->rooms[i].mutex);
     }
 
+    hunterArray_clear(&house->hunters);
     house->starting_room = NULL;
-    house->room_count = 0;
+    house->room_count = 0;   
 }
