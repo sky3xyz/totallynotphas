@@ -1,6 +1,6 @@
 CC ?= gcc
 HEADERDIR := headers/
-CFLAGS ?= -I$(HEADERDIR) -Wall -Wextra 
+CFLAGS ?= -I$(HEADERDIR) -Wall -Wextra -pthread
 
 LDFLAGS := 
 TARGET := totally_not_phasmophoiba

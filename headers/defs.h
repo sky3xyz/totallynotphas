@@ -22,8 +22,8 @@
 #define MAX_ROOMS 24
 #define MAX_ROOM_OCCUPANCY 8
 #define MAX_CONNECTIONS 8
-#define ENTITY_BOREDOM_MAX 15
-#define HUNTER_FEAR_MAX 15
+#define ENTITY_BOREDOM_MAX 60
+#define HUNTER_FEAR_MAX 20
 #define DEFAULT_GHOST_ID 68057
 #define INITAL_HUNTER_ID 22001
 
@@ -81,6 +81,12 @@ enum GhostAction {
     GA_IDLE=0,
     GA_HAUNT=1,
     GA_MOVE=2
+};
+
+enum HunterAction {
+    HA_EVIDENCE = 0,
+    HA_MOVE = 1,
+    HA_CNGEQ = 2
 };
 
 struct CaseFile {
@@ -192,6 +198,7 @@ void hunter_takeTurn(struct Hunter* hunter);
 void hunter_equipmentSwap(struct Hunter* hunter);
 void hunter_exitSimulation(struct Hunter* hunter);
 void* hunter_thread(void* arg);
+bool hunter_returnToVan_handler(struct Hunter* hunter);
 
 // hunterArray helper func.
 int hunterArray_init(struct HunterArray* hunterArray);

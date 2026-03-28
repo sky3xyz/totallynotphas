@@ -2,6 +2,7 @@
 #include "helpers.h"
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
 
 /*
 void hunter_takeTurn(struct Hunter* hunter);
@@ -55,7 +56,15 @@ int hunter_gatherEvidence(struct Hunter* hunter) {
 
     if (evidence_has(roomEvidence, hunter->currentDevice) == true) {
         casefile_addEvidence(hunter->caseFile_ptr, hunter->currentDevice);
+        sem_wait(&hunter->currentRoom->mutex);
+        evidence_clear(&hunter->currentRoom->roomEvidence, hunter->currentDevice);
+        sem_post(&hunter->currentRoom->mutex);
         log_evidence(hunter->id, hunter->boredom, hunter->fear, hunter->currentRoom->name, hunter->currentDevice);
+
+        if (!hunter->currentRoom->exit) {
+            hunter->returningToVan = true;
+        }
+
         return C_ERR_OK;
     }
 
@@ -123,8 +132,11 @@ void hunter_move(struct Hunter* hunter, struct Room* destinationRoom) {
         return;
     }
 
+    if (!hunter->returningToVan) {
+        roomStack_push(&hunter->path, currentRoom);
+    }
+
     hunter->currentRoom = destinationRoom;
-    roomStack_push(&hunter->path, destinationRoom);
 
     log_move(hunter->id, hunter->boredom, hunter->fear, currentRoom->name, destinationRoom->name, hunter->currentDevice);
 
@@ -171,4 +183,119 @@ void hunter_exitSimulation(struct Hunter* hunter) {
 
     roomStack_clear(&hunter->path);
     hunter->exitedSimulation = true;
+}
+
+bool hunter_returnToVan_handler(struct Hunter* hunter) {
+    if(!hunter->returningToVan) {
+        // priorites: success -> fear -> boredom
+        if (hunter->caseFile_ptr != NULL && hunter->caseFile_ptr->solved) {
+            // added null check because of some weird bs that happens 1/1000 times for some reason
+            hunter->exitReason = LR_EVIDENCE;
+            hunter->returningToVan = true;
+        } else if (hunter->fear >= HUNTER_FEAR_MAX) {
+            hunter->exitReason = LR_AFRAID;
+            hunter->returningToVan = true;
+        } else if (hunter->boredom >= ENTITY_BOREDOM_MAX){
+            hunter->exitReason = LR_BORED;
+            hunter->returningToVan = true;
+        }
+
+        if (hunter->returningToVan) {
+            // init van return
+            log_return_to_van(hunter->id, hunter->boredom, hunter->fear, hunter->currentRoom->name, hunter->currentDevice, true);
+        }
+    }
+
+    if (hunter->returningToVan) {
+        if (hunter->currentRoom->exit) {
+            log_return_to_van(hunter->id, hunter->boredom, hunter->fear, hunter->currentRoom->name, hunter->currentDevice, false);
+
+            roomStack_clear(&hunter->path);
+
+            // check for game status
+            if (hunter->caseFile_ptr != NULL && hunter->caseFile_ptr->solved) {
+                hunter->exitReason = LR_EVIDENCE;
+                hunter_exitSimulation(hunter);
+            } else if (hunter->fear >= HUNTER_FEAR_MAX) {
+                hunter->exitReason = LR_AFRAID;
+                hunter_exitSimulation(hunter);
+            } else if (hunter->boredom >= ENTITY_BOREDOM_MAX) {
+                hunter->exitReason = LR_BORED;
+                hunter_exitSimulation(hunter);
+            } else {
+                hunter_equipementSwap(hunter); 
+                hunter->returningToVan = false;
+            }
+            
+        } else {
+            // go back to ban
+            struct Room* nextRoom = roomStack_pop(&hunter->path);
+
+            if (nextRoom != NULL) {
+                struct Room* oldRoom = hunter->currentRoom;
+                hunter_move(hunter, nextRoom);
+
+                // move failed
+                if (hunter->currentRoom == oldRoom) {
+                    roomStack_push(&hunter->path, nextRoom);
+                }
+            } else {
+                fprintf(stderr, "[ERROR] hunter_takeTurn: path is empty but hunter not in van\n");
+                hunter_exitSimulation(hunter);
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+void hunter_takeTurn(struct Hunter* hunter) {
+    if (hunter == NULL || hunter->exitedSimulation) return;
+
+    hunter_updateState(hunter);
+
+    if (hunter_returnToVan_handler(hunter) == true) return;
+
+    enum HunterAction action = (enum HunterAction)rand_int_threadsafe(0, 3);
+
+    switch (action) {
+        case HA_EVIDENCE:
+            hunter_gatherEvidence(hunter);
+            break;
+        
+        case HA_MOVE: {
+            if (hunter->currentRoom->connectedRoom_cnt > 0) {
+                int rand = rand_int_threadsafe(0, hunter->currentRoom->connectedRoom_cnt);
+                struct Room* nextRoom = hunter->currentRoom->connectedRooms[rand];
+
+                hunter_move(hunter, nextRoom);
+            }
+            break;
+        }
+
+        case HA_CNGEQ:
+            hunter_equipementSwap(hunter);
+            break;
+
+        default:
+            fprintf(stderr, "[ERROR] hunter_takeTurn: default case on switch");
+            hunter_gatherEvidence(hunter);
+            break;
+    }
+
+}
+
+void* hunter_thread(void* arg) {
+    struct Hunter* hunter = (struct Hunter*)arg;
+    if (hunter == NULL) return NULL;
+
+    fprintf(stderr, "[INFO] HUNTER THREAD STARTED: %s\n", hunter->name);
+
+    while (!hunter->exitedSimulation) {
+        hunter_takeTurn(hunter);
+        usleep(rand_int_threadsafe(5000, 15000));
+    }
+    
+    fprintf(stderr, "[INFO] HUNTER THREAD ENDED: %s\n", hunter->name);
+    return NULL;
 }

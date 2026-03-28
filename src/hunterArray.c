@@ -71,9 +71,11 @@ int hunterArray_grow(struct HunterArray *hunterArray) {
         return C_ERR_ENOMEM;
     }
     
-    for (int i = 0; i < newCapacity; i++) {
+    for (int i = 0; i < hunterArray->capacity; i++) {
         tmp[i] = hunterArray->data[i];
     }
+
+    free(hunterArray->data);
 
     hunterArray->data = tmp;
     hunterArray->capacity = newCapacity;

@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 int test();
+// eat a dick, currently not working heheehehehehehe
 
 int main() {
     /*
