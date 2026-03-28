@@ -4,7 +4,6 @@
 #include <stdio.h>
 
 /*
-void hunter_move(struct Hunter* hunter, struct Room* destinationRoom);
 void hunter_takeTurn(struct Hunter* hunter);
 void hunter_equipmentSwap(struct Hunter* hunter);
 void hunter_exitRoom(struct Hunter* hunter);
@@ -16,6 +15,7 @@ void hunter_init(struct Hunter* hunter, const char* name, int id, struct Room* s
     hunter->name[MAX_HUNTER_NAME-1] = '\0';
 
     roomStack_init(&hunter->path);
+    roomStack_push(&hunter->path, startRoom);
 
     hunter->id = id;
     hunter->currentDevice = device;
@@ -86,7 +86,7 @@ void hunter_updateState(struct Hunter* hunter) {
     fprintf(stderr, "[INFO] hunter (%d) state updated, ghost not present\n", hunter->id);
 }
 
-void hunter_move(struct Hunter* hunter, struct Room* destinationRoom) {
+void hunter_move(struct Hunter* hunter, struct Room* destinationRoom) { 
     if (hunter == NULL || destinationRoom == NULL) {
         fprintf(stderr, "[ERROR] hunter_move: init null check failed\n");
         return;
@@ -103,4 +103,72 @@ void hunter_move(struct Hunter* hunter, struct Room* destinationRoom) {
         fprintf(stderr, "[INFO] hunter_move: attempted to move to same room\n");
         return;
     }
+
+    deadlock_lockRooms(currentRoom, destinationRoom);
+
+    if (room_isFull(destinationRoom)) {
+        fprintf(stderr, "[INFO] hunter_move: destination room %s is full\n", destinationRoom->name);
+        deadlock_unlockRooms(currentRoom, destinationRoom);
+        return;
+    }
+
+    if (room_removeHunter(currentRoom, hunter) != C_ERR_OK) {
+        deadlock_unlockRooms(currentRoom, destinationRoom);
+        return; 
+    }
+
+    if (!room_addHunter(destinationRoom, hunter)) {
+        room_addHunter(currentRoom, hunter);
+        deadlock_unlockRooms(currentRoom, destinationRoom);
+        return;
+    }
+
+    hunter->currentRoom = destinationRoom;
+    roomStack_push(&hunter->path, destinationRoom);
+
+    log_move(hunter->id, hunter->boredom, hunter->fear, currentRoom->name, destinationRoom->name, hunter->currentDevice);
+
+    deadlock_unlockRooms(currentRoom, destinationRoom);
+}
+
+void hunter_equipementSwap(struct Hunter* hunter) {
+    // rework logic here :3
+    if (hunter == NULL) {
+        fprintf(stderr, "[ERROR] hunter_equipementSwap: hunter was NULL\n");
+        return;
+    }
+
+    const enum EvidenceType* evidenceList = NULL;
+    int cnt = get_all_evidence_types(&evidenceList);
+
+    if (cnt == 0 || evidenceList == NULL) {
+        fprintf(stderr, "[ERROR] hunter_equipementSwap: NULL err\n");
+        return;
+    }
+
+    enum EvidenceType newDevice;
+    do {
+        int rand = rand_int_threadsafe(0, cnt);
+        newDevice = evidenceList[rand];
+    } while (newDevice == hunter->currentDevice);
+
+    log_swap(hunter->id, hunter->boredom, hunter->fear, hunter->currentDevice, newDevice);
+    hunter->currentDevice = newDevice;
+}
+
+void hunter_exitSimulation(struct Hunter* hunter) {
+    if (hunter == NULL || hunter->exitedSimulation) {
+        fprintf(stderr, "[ERROR] hunter_exitSimulation: called improperly\n");
+        return;
+    }
+
+    if (hunter->currentRoom != NULL) {
+        room_removeHunter(hunter->currentRoom, hunter);
+
+        log_exit(hunter->id, hunter->boredom, hunter->fear, hunter->currentRoom->name, hunter->currentDevice, hunter->exitReason);
+        hunter->currentRoom = NULL;
+    }
+
+    roomStack_clear(&hunter->path);
+    hunter->exitedSimulation = true;
 }

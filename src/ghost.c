@@ -20,13 +20,11 @@ void ghost_init(struct Ghost* ghost, struct House* house) {
 }
 
 enum GhostType ghost_randomGhostType() {
-    EvidenceByte bits = 0;
+    const enum GhostType* typeList = NULL;
+    int cnt = get_all_ghost_types(&typeList);
+    int rand = rand_int_threadsafe(0, cnt);
 
-    do {
-        bits = (EvidenceByte)rand_int_threadsafe(0, 127); 
-    } while (!evidence_is_valid_ghost(bits));
-
-    return (enum GhostType)bits;
+    return typeList[rand];
 }
 
 void ghost_move(struct Ghost* ghost, struct Room* destinationRoom) {

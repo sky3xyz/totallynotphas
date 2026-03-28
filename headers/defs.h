@@ -190,7 +190,7 @@ int hunter_gatherEvidence(struct Hunter* hunter);
 void hunter_move(struct Hunter* hunter, struct Room* destinationRoom);
 void hunter_takeTurn(struct Hunter* hunter);
 void hunter_equipmentSwap(struct Hunter* hunter);
-void hunter_exitRoom(struct Hunter* hunter);
+void hunter_exitSimulation(struct Hunter* hunter);
 void* hunter_thread(void* arg);
 
 // hunterArray helper func.
