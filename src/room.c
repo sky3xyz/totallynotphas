@@ -35,11 +35,15 @@ bool room_addHunter(struct Room* room, struct Hunter* hunter) {
         if (room->presentHunters[i] == NULL) {
             room->presentHunters[i] = hunter;
             room->presentHunters_cnt++;
-            fprintf(stderr, "[INFO] HUNTER ADDED TO ROOM\n");
+            fprintf(stderr, "[INFO] room_addHunter: hunter added to room\n");
+            return true;
+        }
+        if (room->exit == true) {
+            fprintf(stderr, "[INFO] room_addHunter: hunter added to room. room over capacity, check if van\n");
             return true;
         }
     }
-    fprintf(stderr, "[ERROR] HUNTER UNABLE TO BE ADDED TO ROOM\n");
+    fprintf(stderr, "[ERROR] room_addHunter: hunter unable to be added to room\n");
     return false;
 }
 
@@ -48,11 +52,11 @@ int room_removeHunter(struct Room* room, struct Hunter* hunter) {
         if (room->presentHunters[i] == hunter) {
             room->presentHunters[i] = NULL;
             room->presentHunters_cnt--;
-            fprintf(stderr, "[INFO] HUNTER REMOVED FROM ROOM\n");
+            fprintf(stderr, "[INFO] room_removeHunter: hunter removed from room\n");
             return C_ERR_OK;
         }
     }
-    fprintf(stderr, "[ERROR] HUNTER UNABLE TO BE REMOVED FROM ROOM\n");
+    fprintf(stderr, "[ERROR] room_removeHunter: hunter unable to be removed from room\n");
     return C_ERR_NOT_OK;
 }
 

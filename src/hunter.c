@@ -28,7 +28,6 @@ void hunter_init(struct Hunter* hunter, const char* name, int id, struct Room* s
     hunter->exitedSimulation = false;
 
     log_hunter_init(hunter->id, hunter->currentRoom->name, hunter->name, hunter->currentDevice);
-    fprintf(stderr, "[INFO] hunter_init: Hunter %s (ID: %d) init.\n", hunter->name, hunter->id);
 }
 
 int hunter_gatherEvidence(struct Hunter* hunter) {
