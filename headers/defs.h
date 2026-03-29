@@ -16,7 +16,6 @@
 #define C_ERR_NOT_OK -99
 #define C_ERR_ENOMEM 12 // stolen from errno cmd / man 3 errno -- Cannot allocate memory
 #define C_ERR_EINVAL 22 // stolen from errno cmd / man 3 errno -- Invalid argument
-
 #define MAX_ROOM_NAME 64
 #define MAX_HUNTER_NAME 64
 #define MAX_ROOMS 24
