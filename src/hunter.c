@@ -42,22 +42,15 @@ int hunter_gatherEvidence(struct Hunter* hunter) {
         return C_ERR_EINVAL;
     }
 
-    // take snapshot of current evidence in room
     if (sem_wait(&hunter->currentRoom->mutex) != 0) {
         fprintf(stderr, "[ERROR] hunter_gatherEvidence: failed to sem_wait on currentRoom\n");
         return C_ERR_NOT_OK;
     }
-    enum EvidenceType roomEvidence = hunter->currentRoom->roomEvidence;
-    if (sem_post(&hunter->currentRoom->mutex) != 0) {
-        fprintf(stderr, "[ERROR] hunter_gatherEvidence: failed to sem_post on currentRoom\n");
-        return C_ERR_NOT_OK;
-    }
-
-    if (evidence_has(roomEvidence, hunter->currentDevice) == true) {
-        casefile_addEvidence(hunter->caseFile_ptr, hunter->currentDevice);
-        sem_wait(&hunter->currentRoom->mutex);
+    
+    if (evidence_has(hunter->currentRoom->roomEvidence, hunter->currentDevice) == true) {
         evidence_clear(&hunter->currentRoom->roomEvidence, hunter->currentDevice);
         sem_post(&hunter->currentRoom->mutex);
+        casefile_addEvidence(hunter->caseFile_ptr, hunter->currentDevice);
         log_evidence(hunter->id, hunter->boredom, hunter->fear, hunter->currentRoom->name, hunter->currentDevice);
 
         if (!hunter->currentRoom->exit) {
@@ -67,6 +60,7 @@ int hunter_gatherEvidence(struct Hunter* hunter) {
         return C_ERR_OK;
     }
 
+    sem_post(&hunter->currentRoom->mutex);
     fprintf(stderr, "[INFO] hunter_gatherEvidence: hunter did not find evidence\n");
     return C_ERR_NO_EVIDENCE;
 }
@@ -83,12 +77,15 @@ void hunter_updateState(struct Hunter* hunter) {
     }
 
     // update fear/boredom
+    sem_wait(&hunter->currentRoom->mutex);
     if (hunter->currentRoom->currentGhost != NULL) {
         hunter->boredom = 0;
         hunter->fear++;
         fprintf(stderr, "[INFO] hunter (%d) state updated, ghost present\n", hunter->id);
+        sem_post(&hunter->currentRoom->mutex);
         return;
     }
+    sem_post(&hunter->currentRoom->mutex);
 
     hunter->boredom++;
     fprintf(stderr, "[INFO] hunter (%d) state updated, ghost not present\n", hunter->id);
@@ -142,10 +139,10 @@ void hunter_move(struct Hunter* hunter, struct Room* destinationRoom) {
     deadlock_unlockRooms(currentRoom, destinationRoom);
 }
 
-void hunter_equipementSwap(struct Hunter* hunter) {
+void hunter_equipmentSwap(struct Hunter* hunter) {
     // rework logic here :3
     if (hunter == NULL) {
-        fprintf(stderr, "[ERROR] hunter_equipementSwap: hunter was NULL\n");
+        fprintf(stderr, "[ERROR] hunter_equipmentSwap: hunter was NULL\n");
         return;
     }
 
@@ -153,7 +150,7 @@ void hunter_equipementSwap(struct Hunter* hunter) {
     int cnt = get_all_evidence_types(&evidenceList);
 
     if (cnt == 0 || evidenceList == NULL) {
-        fprintf(stderr, "[ERROR] hunter_equipementSwap: NULL err\n");
+        fprintf(stderr, "[ERROR] hunter_equipmentSwap: NULL err\n");
         return;
     }
 
@@ -174,8 +171,10 @@ void hunter_exitSimulation(struct Hunter* hunter) {
     }
 
     if (hunter->currentRoom != NULL) {
+        sem_wait(&hunter->currentRoom->mutex);
         room_removeHunter(hunter->currentRoom, hunter);
-
+        sem_post(&hunter->currentRoom->mutex);
+        
         log_exit(hunter->id, hunter->boredom, hunter->fear, hunter->currentRoom->name, hunter->currentDevice, hunter->exitReason);
         hunter->currentRoom = NULL;
     }
@@ -187,6 +186,7 @@ void hunter_exitSimulation(struct Hunter* hunter) {
 bool hunter_returnToVan_handler(struct Hunter* hunter) {
     if(!hunter->returningToVan) {
         // priorites: success -> fear -> boredom
+        sem_wait(&hunter->caseFile_ptr->mutex);
         if (hunter->caseFile_ptr != NULL && hunter->caseFile_ptr->solved) {
             // added null check because of some weird bs that happens 1/1000 times for some reason
             hunter->exitReason = LR_EVIDENCE;
@@ -198,6 +198,7 @@ bool hunter_returnToVan_handler(struct Hunter* hunter) {
             hunter->exitReason = LR_BORED;
             hunter->returningToVan = true;
         }
+        sem_post(&hunter->caseFile_ptr->mutex);
 
         if (hunter->returningToVan) {
             // init van return
@@ -222,7 +223,7 @@ bool hunter_returnToVan_handler(struct Hunter* hunter) {
                 hunter->exitReason = LR_BORED;
                 hunter_exitSimulation(hunter);
             } else {
-                hunter_equipementSwap(hunter); 
+                hunter_equipmentSwap(hunter); 
                 hunter->returningToVan = false;
             }
             
@@ -273,7 +274,7 @@ void hunter_takeTurn(struct Hunter* hunter) {
         }
 
         case HA_CNGEQ:
-            hunter_equipementSwap(hunter);
+            hunter_equipmentSwap(hunter);
             break;
 
         default:

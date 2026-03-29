@@ -154,7 +154,7 @@ void ghost_takeTurn(struct Ghost* ghost) {
             return;
 
         case GA_MOVE: {
-            struct Room *destination = neighbors[rand_int_threadsafe(0, neighborCount-1)];
+            struct Room *destination = neighbors[rand_int_threadsafe(0, neighborCount)];
             ghost_move(ghost, destination);
             return;
         }

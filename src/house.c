@@ -15,7 +15,7 @@ struct Room* house_getRndRoom(struct House* house) {
     if (house == NULL || house->room_count == 0) return NULL;
     int roomID;
 
-    roomID = rand_int_threadsafe(0, house->room_count - 1);
+    roomID = rand_int_threadsafe(0, house->room_count);
 
     return &house->rooms[roomID];
 }

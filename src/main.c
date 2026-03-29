@@ -69,7 +69,6 @@ int main(int argc, char *argv[]) {
         struct Hunter* h_ptr = &house.hunters.data[house.hunters.contains - 1];
         hunter_init(h_ptr, name_input, hunter_id, house.starting_room, &house.caseFile, initialDevice);
 
-        room_addHunter(house.starting_room, h_ptr);
         printf("Added hunter %s (%d).\n", h_ptr->name, h_ptr->id);
     }
 
@@ -79,6 +78,11 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
+    for (int i = 0; i < house.hunters.contains; i++) {
+        struct Hunter* h_ptr = &house.hunters.data[i];
+        room_addHunter(house.starting_room, h_ptr);
+    }
+    
     pthread_t thread_arr[house.hunters.contains + 1];
     if (createThreads(&house, thread_arr) != 0) {
         printf("[ERROR] %s: error occurred when creating thread(s). check stderr.\n", argv[0]);
