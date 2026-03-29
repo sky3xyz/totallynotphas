@@ -5,7 +5,7 @@
 #include <string.h>
 #include <pthread.h>
 
-int createThreads(struct House* house, pthread_t** arr);
+int createThreads(struct House* house, pthread_t* arr);
 void printResults(struct House* house);
 
 int main(int argc, char *argv[]) {
@@ -44,21 +44,22 @@ int main(int argc, char *argv[]) {
     char name_input[MAX_HUNTER_NAME];
 
     while (1) {
-        printf("Enter hunter name. (\"done\" when done.)\n");
-        scanf("%s", &name_input);
-        while (getchar() != '\n')
-        name_input[strcspn(name_input, "\n")] = 0; // remove \n
+        printf("Enter hunter name (or \"done\"): ");
+        fgets(name_input, sizeof(name_input), stdin);
+        name_input[strcspn(name_input, "\n")] = '\0';
         
         if (strcmp(name_input, "done") == 0) break;
 
         int hunter_id = -1;
-        do {
+        while(hunter_id == -1) {
+            int c;
             printf("Enter hunter ID: ");
             if (scanf("%d", &hunter_id) != 1) {
                 printf("Invalid ID, try again.\n");
             }
-        } while(hunter_id != -1);
-        while (getchar() != '\n');
+            while ((c = getchar()) != '\n' && c != EOF);
+        }
+        
         
         enum EvidenceType initialDevice = all_ev[rand_int_threadsafe(0, ev_cnt)];
 
@@ -78,14 +79,14 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    pthread_t* thread_arr[house.hunters.contains + 1];
+    pthread_t thread_arr[house.hunters.contains + 1];
     if (createThreads(&house, thread_arr) != 0) {
         printf("[ERROR] %s: error occurred when creating thread(s). check stderr.\n", argv[0]);
     }
 
-    pthread_join(*thread_arr[0], NULL);
+    pthread_join(thread_arr[0], NULL);
     for (int i = 0; i < house.hunters.contains; i++) {
-        if (pthread_join(*thread_arr[i+1], NULL) != 0) {
+        if (pthread_join(thread_arr[i+1], NULL) != 0) {
             fprintf(stderr, "[ERROR] %s: failed to join hunter thread %s (ID: %d)", argv[0], house.hunters.data[i].name, house.hunters.data[i].id);
         }
     }
@@ -96,15 +97,15 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-int createThreads(struct House* house, pthread_t** arr) {
-    if (pthread_create(arr[0], NULL, ghost_thread, &house->ghost) != 0) {
+int createThreads(struct House* house, pthread_t* arr) {
+    if (pthread_create(&arr[0], NULL, ghost_thread, &house->ghost) != 0) {
         fprintf(stderr, "[ERROR] createThreads: failed to create Ghost thread.\n");
         house_clear(house);
         return C_ERR_NOT_OK;
     }
 
     for (int i = 0; i < house->hunters.contains; i++) {
-        if (pthread_create(arr[i+1], NULL, hunter_thread, &house->hunters.data[i]) != 0) {
+        if (pthread_create(&arr[i+1], NULL, hunter_thread, &house->hunters.data[i]) != 0) {
             fprintf(stderr, "[ERROR] createThreads: failed to create hunter thread for %s (ID: %d)", house->hunters.data[i].name, house->hunters.data[i].id);
         }
     }
@@ -116,6 +117,7 @@ void printResults(struct House* house) {
     printf("==========================\n");
     printf("      RESULTS\n");
     printf("==========================\n");
+    printf("\n");
 
     // evidence
     const enum EvidenceType* all_ev = NULL;
@@ -132,14 +134,16 @@ void printResults(struct House* house) {
     if (collected_cnt == 0) {
         printf("\t- No Evidence Collected :(\n");
     }
+    printf("\n");
 
     // hunter statuses
     printf("=== HUNTER STATUS ===\n");
     for (int i = 0; i < house->hunters.contains; i++) {
         struct Hunter* hunter = &house->hunters.data[i];
-        printf("\t%-20s (ID: %d) exit reason: %s", hunter->name, hunter->id, exit_reason_to_string(hunter->exitReason));
+        printf("\t%-20s (ID: %d) exit reason: %s\n", hunter->name, hunter->id, exit_reason_to_string(hunter->exitReason));
     }
 
+    printf("\n");
     // ghost identitfication
     printf("=== DID WE IDENTIFY THE GHOST ===\n");
     printf("\tActual Ghost Type -> %s\n", ghost_to_string(house->ghost.type));

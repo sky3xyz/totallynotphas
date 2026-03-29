@@ -33,8 +33,10 @@ debug-a *args:
 valgrind *args:
     just debug-build
     valgrind \
+      -s \
       --leak-check=full \
       --track-origins=yes \
+      --show-leak-kinds=all \
       "./{{target}}" {{args}}
 
 dbv:
