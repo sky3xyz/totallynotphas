@@ -9,17 +9,6 @@ int createThreads(struct House* house, pthread_t* arr);
 void printResults(struct House* house);
 
 int main(int argc, char *argv[]) {
-    if (argc != 1 && strcmp("--report", argv[1]) == 0) {
-        // run with report SIGUSR1, SIGUSR2
-        fprintf(stderr, "[INFO] %s: ran with flag \"--report\"", argv[0]);
-        exit(0);
-    }
-
-    if (argc != 1 && strcmp("--report", argv[1]) != 0) {
-        printf("%s: invalid argument \"%s\"", argv[0], argv[1]);
-        exit(22);
-    }
-
     struct House house;
     house_init(&house);
     house_populate_rooms(&house);
