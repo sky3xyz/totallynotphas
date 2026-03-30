@@ -8,7 +8,7 @@
 int createThreads(struct House* house, pthread_t* arr);
 void printResults(struct House* house);
 
-int main(int argc, char *argv[]) {
+int main() {
     struct House house;
     house_init(&house);
     house_populate_rooms(&house);
@@ -61,13 +61,13 @@ int main(int argc, char *argv[]) {
     
     pthread_t thread_arr[house.hunters.contains + 1];
     if (createThreads(&house, thread_arr) != 0) {
-        printf("[ERROR] %s: error occurred when creating thread(s). check stderr.\n", argv[0]);
+        printf("[ERROR] %s: error occurred when creating thread(s). check stderr.\n", "main");
     }
 
     pthread_join(thread_arr[0], NULL);
     for (int i = 0; i < house.hunters.contains; i++) {
         if (pthread_join(thread_arr[i+1], NULL) != 0) {
-            fprintf(stderr, "[ERROR] %s: failed to join hunter thread %s (ID: %d)", argv[0], house.hunters.data[i].name, house.hunters.data[i].id);
+            fprintf(stderr, "[ERROR] %s: failed to join hunter thread %s (ID: %d)", "main", house.hunters.data[i].name, house.hunters.data[i].id);
         }
     }
 

@@ -27,6 +27,8 @@ void house_clear(struct House* house) {
         sem_destroy(&house->rooms[i].mutex);
     }
 
+    sem_destroy(&house->caseFile.mutex);
+
     hunterArray_clear(&house->hunters);
     house->starting_room = NULL;
     house->room_count = 0;   

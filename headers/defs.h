@@ -167,6 +167,99 @@ struct House {
 };
 
 
+// house helper func.
+/**
+ * @brief Initializes House structure.
+ * @param[in] house House structure to initalize.
+ */
+void house_init(struct House* house);
+/**
+ * @brief Return a random Room from the House.
+ * @param[in] house House structure.
+ * @returns Random Room struct from the House.
+ */
+struct Room* house_getRndRoom(struct House* house);
+/**
+ * @brief Clears a House and its members' memory
+ * @param[in] house House structure.
+ */
+void house_clear(struct House* house);
+
+// room helper func.
+/**
+ * @brief Initializes a Room structure.
+ * @param[in] room Room structure.
+ * @param[in] name Room Name.
+ * @param[in] is_exit Is the room used to exit the simulation?
+ */
+void room_init(struct Room* room, const char* name, bool is_exit);
+/**
+ * @brief Adds evidence to Room.
+ * @param[in] room Room to add evidence to.
+ * @param[in] evidence EvidenceByte to add to Room.
+ */
+void room_addEvidence(struct Room* room, EvidenceByte evidence);
+/**
+ * @brief Adds Hunter to Room.
+ * @param[in] room Room to add Hunter to.
+ * @param[in] hunter Hunter to add to Room.
+ * @returns true, if able to add Hunter to Room. false, if unable to add Hunter to Room.
+ */
+bool room_addHunter(struct Room* room, struct Hunter* hunter);
+/**
+ * @brief Removes Hunter from Room.
+ * @param[in] room Room to remove Hunter from.
+ * @param[in] hunter Hunter to remove from Room.
+ * @returns C_ERR_OK, if Hunter is able to be removed from Room. C_ERR_NOT_OK, if Hunter is unable to be removed from Room.
+ */
+int room_removeHunter(struct Room* room, struct Hunter* hunter);
+/**
+ * @brief Creates a bi-directional link between two Rooms.
+ * @param[in] a One of two Rooms to connect.
+ * @param[in] b One of two Rooms to connect.
+ * @returns C_ERR_OK, if Rooms are able to connect. C_ERR_NOT_OK, if Rooms are unable to be connected.
+ */
+int room_connect(struct Room* a, struct Room* b);
+/**
+ * @brief Checks if Room has reached maximum occupancy.
+ * @param[in] room Room to check.
+ * @returns true, if Room has reached maximum occupancy. false, if Room has not reached maximum occupancy.
+ */
+bool room_isFull(struct Room* room);
+
+
+// roomStack helper func.
+/**
+ * @brief Initalizes a RoomStack.
+ * @param[in] roomStack RoomStack to initalize.
+ */
+void roomStack_init(struct RoomStack* roomStack);
+/**
+ * @brief Adds a Room to the RoomStack.
+ * @param[in] roomStack RoomStack to push Room to.
+ * @param[in] room Room to push onto RoomStack.
+ * @returns C_ERR_OK on success. C_ERR_ENOMEM on memory allocation failure. C_ERR_EINVAL when given an invalid RoomStack.
+ */
+int roomStack_push(struct RoomStack* roomStack, struct Room* room);
+/**
+ * @brief Pops and returns a Room from the top of the RoomStack.
+ * @param[in] roomStack RoomStack to pop Room from.
+ * @returns Room from top of the RoomStack. NULL if roomStack invalid or empty.
+ */
+struct Room* roomStack_pop(struct RoomStack* roomStack);
+/**
+ * @brief Clears and frees RoomStack's memory.
+ * @param[in] roomStack RoomStack to clear.
+ * @returns C_ERR_OK on success. C_ERR_EINVAL was given invalid RoomStack.
+ */
+int roomStack_clear(struct RoomStack* roomStack);
+/**
+ * @brief Checks if RoomStack is empty.
+ * @param[in] roomStack RoomStack to check.
+ * @returns true, if RoomStack is empty. false, otherwise.
+ */
+bool roomStack_isEmpty(const struct RoomStack* roomStack);
+
 // hunter helper func.
 /**  
  * @brief Initalize new Hunter.
@@ -224,15 +317,45 @@ void hunter_exitSimulation(struct Hunter* hunter);
  */
 void* hunter_thread(void* arg);
 
+// hunterArray helper func.
 /**
- * @brief Handle the Hunter's return to the van.
- * @param[in] hunter Hunter returning to van.
- * @returns true if the Hunter should return/is returning to the van, false otherwise.
+ * @brief Initialize a HunterArray to an empty state.
+ * @param[in] hunterArray Pointer to the HunterArray to initialize.
+ * @returns C_ERR_OK on success, non-zero on failure.
  */
-bool hunter_returnToVan_handler(struct Hunter* hunter);
+int hunterArray_init(struct HunterArray* hunterArray);
+
+/**
+ * @brief Append a Hunter to the end of a HunterArray.
+ * @param[in] hunterArray Pointer to the HunterArray to append to.
+ * @param[in] hunter Pointer to the Hunter to append.
+ * @returns C_ERR_OK on success, non-zero on failure.
+ */
+int hunterArray_append(struct HunterArray* hunterArray,
+                        struct Hunter* hunter);
+
+/**
+ * @brief Grow the capacity of a HunterArray.
+ * @param[in,out] hunterArray Pointer to the HunterArray whose capacity should grow.
+ * @returns C_ERR_OK on success, non-zero on failure.
+ */
+int hunterArray_grow(struct HunterArray* hunterArray);
+
+/**
+ * @brief Clear a HunterArray, removing all stored Hunters.
+ * @param[in,out] hunterArray Pointer to the HunterArray to clear.
+ * @returns C_ERR_OK on success, non-zero on failure.
+ */
+int hunterArray_clear(struct HunterArray* hunterArray);
+
+/**
+ * @brief Check whether a HunterArray can append another Hunter without growing.
+ * @param[in] hunterArray Pointer to the HunterArray to check.
+ * @returns C_ERR_OK if the array can append, non-zero otherwise.
+ */
+int hunterArray_canAppend(struct HunterArray* hunterArray);
 
 // ghost helper func.
-
 /**
  * @brief Select a random Ghost type.
  * @returns Random GhostType value.
@@ -273,21 +396,20 @@ void ghost_takeTurn(struct Ghost* ghost);
 
 /**
  * @brief Thread entry function for running a Ghost.
- * @param[in] arg Ghost pointer passed to the thread.
+ * @param[in] arg Ghostointer passed to the thread.
  * @returns Thread exit value (typically NULL).
  */
 void* ghost_thread(void* arg);
 
 /**
- * @brief Update boredom state and determine whether the Ghost should leave simulation.
- * @param[in] ghost Ghost to update.
- * @param[in] hunterConut Number of hunters currently in the simulation.
- * @returns true if the Ghost becomes bored enough to leave simulation, false otherwise.
+ * @brief Update boredom state and determine whether the Ghost should change behavior.
+ * @param[in,out] ghost Ghost to update.
+ * @param[in] hunterConut Number of hunters currently in the simulation (spelling matches prototype).
+ * @returns true if the Ghost becomes bored enough to act/change state, false otherwise.
  */
 bool ghost_updateCheckBoredom(struct Ghost* ghost, int hunterConut);
 
 // casefile helper func.
-
 /**
  * @brief Initialize an empty CaseFile.
  * @param[out] caseFile CaseFile to initialize.
@@ -296,37 +418,35 @@ void casefile_init(struct CaseFile* caseFile);
 
 /**
  * @brief Add an evidence type to the shared CaseFile.
- * @param[in] caseFile CaseFile to modify.
+ * @param[in,out] caseFile CaseFile to modify.
  * @param[in] ev Evidence type to add.
  */
 void casefile_addEvidence(struct CaseFile* caseFile, enum EvidenceType ev);
 
 // evidence helper func.
-
 /**
- * @brief Check whether a given evidence type is present in bits.
- * @param[in] bits Evidence bits.
+ * @brief Check whether a given evidence type is present in a bitset.
+ * @param[in] bits Evidence bitfield.
  * @param[in] ev Evidence type to check for.
  * @returns true if ev is present in bits, false otherwise.
  */
 bool evidence_has(EvidenceByte bits, enum EvidenceType ev);
 
 /**
- * @brief Set an evidence type in bits.
- * @param[in,out] bits Evidence bits to modify.
+ * @brief Set (enable) an evidence type in a bitset.
+ * @param[in,out] bits Evidence bitfield to modify.
  * @param[in] ev Evidence type to set.
  */
 void evidence_set(EvidenceByte* bits, enum EvidenceType ev);
 
 /**
- * @brief Clear an evidence type in bits.
- * @param[in,out] bits Evidence bits to modify.
+ * @brief Clear (disable) an evidence type in a bitset.
+ * @param[in,out] bits Evidence bitfield to modify.
  * @param[in] ev Evidence type to clear.
  */
 void evidence_clear(EvidenceByte* bits, enum EvidenceType ev);
 
 // deadlock prevention helper func.
-
 /**
  * @brief Lock two rooms in an order that prevents deadlocks.
  * @param[in] roomOne First room to lock.
@@ -336,7 +456,7 @@ void evidence_clear(EvidenceByte* bits, enum EvidenceType ev);
 int deadlock_lockRooms(struct Room* roomOne, struct Room* roomTwo);
 
 /**
- * @brief Unlocks two rooms in an order that prevents deadlocks.
+ * @brief Unlock two previously locked rooms.
  * @param[in] roomOne First room to unlock.
  * @param[in] roomTwo Second room to unlock.
  * @returns C_ERR_OK on success, otherwise a non-zero error code.

@@ -43,4 +43,7 @@ dbv:
     just debug-build
     just valgrind
 
-    
+test:
+    rm -rf log_*.csv
+    python ./misc/tester.py
+    python ./misc/validate_logs.py

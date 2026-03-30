@@ -38,11 +38,13 @@ bool room_addHunter(struct Room* room, struct Hunter* hunter) {
             fprintf(stderr, "[INFO] room_addHunter: hunter added to room\n");
             return true;
         }
-        if (room->exit == true) {
-            fprintf(stderr, "[INFO] room_addHunter: hunter added to room. room over capacity, check if van\n");
-            return true;
-        }
     }
+
+    if (room->exit == true) {
+        fprintf(stderr, "[INFO] room_addHunter: hunter added to room. room over capacity, check if van\n");
+        return true;
+    }
+    
     fprintf(stderr, "[ERROR] room_addHunter: hunter unable to be added to room\n");
     return false;
 }
