@@ -33,7 +33,7 @@ int hunterArray_canAppend(struct HunterArray* hunterArray) {
         return C_ERR_OK;
     }
 
-    fprintf(stderr, "[ERROR] hunterArray_canAppend: hunterArray full.\n");
+    // fprintf(stderr, "[INFO] hunterArray_canAppend: hunterArray full.\n");
     return C_ERR_NOT_OK;
 }
 

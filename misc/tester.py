@@ -4,6 +4,10 @@ import sys
 
 BIN = "./totally_not_phasmophoiba"
 
+if (len(sys.argv) > 1 and "v" in sys.argv[1]):
+    BIN = "just valgrind"
+
+
 child = pexpect.spawn(BIN, encoding="UTF-8", timeout=10)
 
 names = ["Jayson", "Lillian", "Cedrick", "Dominique", "Casey", "Cyril", "Penny", "Lydia", "Boyce", "Bernard", "Zion"]

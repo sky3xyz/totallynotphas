@@ -5,81 +5,7 @@
 #include <string.h>
 #include <pthread.h>
 
-int createThreads(struct House* house, pthread_t* arr);
-void printResults(struct House* house);
-
-int main() {
-    struct House house;
-    house_init(&house);
-    house_populate_rooms(&house);
-    ghost_init(&house.ghost, &house);
-    
-    // take input
-    const enum EvidenceType* all_ev = NULL;
-    int ev_cnt = get_all_evidence_types(&all_ev);
-    char name_input[MAX_HUNTER_NAME];
-    printf("========================================\n");
-    printf("Legally Distinct Ghost Hunting Game\n");
-    printf("Willow House Investigation\n");
-    printf("========================================\n");
-
-    while (1) {
-        printf("\nEnter hunter name (or \"done\"): ");
-        fgets(name_input, sizeof(name_input), stdin);
-        name_input[strcspn(name_input, "\n")] = '\0';
-        
-        if (strcmp(name_input, "done") == 0) break;
-
-        int hunter_id = -1;
-        while(hunter_id == -1) {
-            int c;
-            printf("Enter hunter ID: ");
-            if (scanf("%d", &hunter_id) != 1) {
-                printf("Invalid ID, try again.\n");
-            }
-            while ((c = getchar()) != '\n' && c != EOF);
-        }
-        
-        
-        enum EvidenceType initialDevice = all_ev[rand_int_threadsafe(0, ev_cnt)];
-
-        struct Hunter buddy;
-        hunterArray_append(&house.hunters, &buddy);
-
-        struct Hunter* h_ptr = &house.hunters.data[house.hunters.contains - 1];
-        hunter_init(h_ptr, name_input, hunter_id, house.starting_room, &house.caseFile, initialDevice);
-
-        printf("Added hunter %s (%d).\n", h_ptr->name, h_ptr->id);
-    }
-
-    if (house.hunters.contains == 0) {
-        printf("[ERROR] No hunters added. Bye.\n");
-        house_clear(&house);
-        return 0;
-    }
-
-    for (int i = 0; i < house.hunters.contains; i++) {
-        struct Hunter* h_ptr = &house.hunters.data[i];
-        room_addHunter(house.starting_room, h_ptr);
-    }
-    
-    pthread_t thread_arr[house.hunters.contains + 1];
-    if (createThreads(&house, thread_arr) != 0) {
-        printf("[ERROR] %s: error occurred when creating thread(s). check stderr.\n", "main");
-    }
-
-    pthread_join(thread_arr[0], NULL);
-    for (int i = 0; i < house.hunters.contains; i++) {
-        if (pthread_join(thread_arr[i+1], NULL) != 0) {
-            fprintf(stderr, "[ERROR] %s: failed to join hunter thread %s (ID: %d)", "main", house.hunters.data[i].name, house.hunters.data[i].id);
-        }
-    }
-
-    printResults(&house);
-    house_clear(&house);
-
-    return 0;
-}
+void middleware(struct House* house);
 
 int createThreads(struct House* house, pthread_t* arr) {
     if (pthread_create(&arr[0], NULL, ghost_thread, &house->ghost) != 0) {
@@ -162,4 +88,145 @@ void printResults(struct House* house) {
         printf("Ghost Wins!\n");
     }
     printf("====\n");
+}
+
+int runInteractiveTUI() {
+    struct House house;
+    house_init(&house);
+    house_populate_rooms(&house);
+    ghost_init(&house.ghost, &house);
+    
+    // take input
+    const enum EvidenceType* all_ev = NULL;
+    int ev_cnt = get_all_evidence_types(&all_ev);
+    char name_input[MAX_HUNTER_NAME];
+    printf("========================================\n");
+    printf("Legally Distinct Ghost Hunting Game\n");
+    printf("Willow House Investigation\n");
+    printf("========================================\n");
+
+    while (1) {
+        printf("\nEnter hunter name (or \"done\"): ");
+        fgets(name_input, sizeof(name_input), stdin);
+        name_input[strcspn(name_input, "\n")] = '\0';
+        
+        if (strcmp(name_input, "done") == 0) break;
+
+        int hunter_id = -1;
+        while(hunter_id == -1) {
+            int c;
+            printf("Enter hunter ID: ");
+            if (scanf("%d", &hunter_id) != 1) {
+                printf("Invalid ID, try again.\n");
+            }
+            while ((c = getchar()) != '\n' && c != EOF);
+        }
+        
+        
+        enum EvidenceType initialDevice = all_ev[rand_int_threadsafe(0, ev_cnt)];
+
+        struct Hunter buddy;
+        hunterArray_append(&house.hunters, &buddy);
+
+        struct Hunter* h_ptr = &house.hunters.data[house.hunters.contains - 1];
+        hunter_init(h_ptr, name_input, hunter_id, house.starting_room, &house.caseFile, initialDevice);
+
+        printf("Added hunter %s (%d).\n", h_ptr->name, h_ptr->id);
+    }
+
+    if (house.hunters.contains == 0) {
+        printf("[ERROR] No hunters added. Bye.\n");
+        house_clear(&house);
+        return 0;
+    }
+
+    middleware(&house);
+
+    printResults(&house);
+    house_clear(&house);
+
+    return 0;
+}
+
+int automated(char* argv[], int reportI) {
+    // assume hardcoded values until forum post gets reply
+    struct House house;
+    house_init(&house);
+    house_populate_rooms(&house);
+    ghost_init(&house.ghost, &house);
+    const enum EvidenceType* all_ev = NULL;
+    int ev_cnt = get_all_evidence_types(&all_ev);
+    int hunter_cnt;
+
+    if (argv[reportI+1] != NULL) {
+        hunter_cnt = atoi(argv[reportI+1]);
+    } else {
+        hunter_cnt = 0;
+    }
+
+    if (hunter_cnt == 0) {
+        printf("%s: report must be followed by an integer\n", argv[0]);
+        return C_ERR_NOT_OK;
+    }
+
+    for (int i = 0; i < hunter_cnt; i++) {
+        char prefix[MAX_HUNTER_NAME] = "Hunter ";
+        char suffix[12];
+
+        // itoa is not a function :(
+        sprintf(suffix, "%d", i);
+
+        enum EvidenceType initialDevice = all_ev[rand_int_threadsafe(0, ev_cnt)];
+
+        struct Hunter buddy;
+        hunterArray_append(&house.hunters, &buddy);
+
+        struct Hunter* h_ptr = &house.hunters.data[house.hunters.contains - 1];
+        hunter_init(h_ptr, strncat(prefix, suffix, MAX_HUNTER_NAME-1), i, house.starting_room, &house.caseFile, initialDevice);
+    }
+
+    middleware(&house);
+
+    printResults(&house);
+    house_clear(&house);
+
+    return 0;
+}
+
+void middleware(struct House* house) {
+    for (int i = 0; i < house->hunters.contains; i++) {
+        struct Hunter* h_ptr = &house->hunters.data[i];
+        room_addHunter(house->starting_room, h_ptr);
+    }
+    
+    pthread_t thread_arr[house->hunters.contains + 1];
+    if (createThreads(house, thread_arr) != 0) {
+        printf("[ERROR] %s: error occurred when creating thread(s). check stderr.\n", "main");
+    }
+
+    pthread_join(thread_arr[0], NULL);
+    for (int i = 0; i < house->hunters.contains; i++) {
+        if (pthread_join(thread_arr[i+1], NULL) != 0) {
+            fprintf(stderr, "[ERROR] %s: failed to join hunter thread %s (ID: %d)", "main", house->hunters.data[i].name, house->hunters.data[i].id);
+        }
+    }
+}
+
+int main(int argc, char* argv[]) {
+    bool multi = false;
+    int reportI;
+
+    for (int i = 0; i < argc; i++) {
+        if(strcmp(argv[i], "-report") == 0) {
+            reportI = i;
+            multi = true;
+            break;
+        }
+    }
+
+    if (multi) {
+        return automated(argv, reportI);
+    }
+
+    return runInteractiveTUI();
 }
