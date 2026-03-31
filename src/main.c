@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <signal.h>
 
 void middleware(struct House* house);
 
@@ -187,10 +188,12 @@ int automated(char* argv[], int reportI) {
 
     middleware(&house);
 
-    printResults(&house);
+    bool solved = house.caseFile.solved;
     house_clear(&house);
 
-    return 0;
+    printf("%d\n", solved);
+    if (solved) exit(SIGUSR1);
+    exit(SIGUSR2);
 }
 
 void middleware(struct House* house) {
