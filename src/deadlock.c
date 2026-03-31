@@ -23,7 +23,7 @@ int deadlock_lockRooms(struct Room* roomOne, struct Room* roomTwo) {
     
     if (roomOne == roomTwo) {
         sem_wait(&roomOne->mutex);
-        fprintf(stderr, "[INFO] DEADLOCK LOCK COMPLETE\n");
+        // fprintf(stderr, "[INFO] DEADLOCK LOCK COMPLETE\n");
         return C_ERR_OK;
     }
 
@@ -37,7 +37,7 @@ int deadlock_lockRooms(struct Room* roomOne, struct Room* roomTwo) {
 
     if(sem_wait(&firstRoom->mutex) != 0) fprintf(stderr, "[ERROR] DEADLOCK_LOCK UNABLE TO SEM_WAIT RM\n");
     if (sem_wait(&secondRoom->mutex) != 0) fprintf(stderr, "[ERROR] DEADLOCK_LOCK UNABLE TO SEM_WAIT RM2\n");
-    fprintf(stderr, "[INFO] DEADLOCK LOCK COMPLETE\n");
+    // fprintf(stderr, "[INFO] DEADLOCK LOCK COMPLETE\n");
     return C_ERR_OK;
 }
 
@@ -49,7 +49,7 @@ int deadlock_unlockRooms(struct Room* roomOne, struct Room* roomTwo) {
     
     if (roomOne == roomTwo) {
         sem_post(&roomOne->mutex);
-        fprintf(stderr, "[INFO] DEADLOCK UNLOCK COMPLETE\n");
+        // fprintf(stderr, "[INFO] DEADLOCK UNLOCK COMPLETE\n");
         return C_ERR_OK;
     }
 
@@ -64,6 +64,6 @@ int deadlock_unlockRooms(struct Room* roomOne, struct Room* roomTwo) {
     // unlock in reverse order of lock. pthreads man page said so :shrug:
     if (sem_post(&secondRoom->mutex) != 0) fprintf(stderr, "[ERROR] DEADLOCK_UNLOCK UNABLE TO SEM_POST RM2\n");
     if (sem_post(&firstRoom->mutex) != 0) fprintf(stderr, "[ERROR] DEADLOCK_UNLOCK UNABLE TO SEM_POST RM1\n");
-    fprintf(stderr, "[INFO] DEADLOCK UNLOCK SUCCESSFUL\n");
+    // fprintf(stderr, "[INFO] DEADLOCK UNLOCK SUCCESSFUL\n");
     return C_ERR_OK;
 }

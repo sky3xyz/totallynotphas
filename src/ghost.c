@@ -41,7 +41,7 @@ void ghost_move(struct Ghost* ghost, struct Room* destinationRoom) {
     }
 
     if (currentRoom == destinationRoom) {
-        fprintf(stderr, "[INFO] ghost_move: attempted to move to same room\n");
+        // fprintf(stderr, "[INFO] ghost_move: attempted to move to same room\n");
         return;
     }
 
@@ -91,7 +91,7 @@ void ghost_haunt(struct Ghost* ghost) {
 }
 
 void ghost_takeTurn(struct Ghost* ghost) {
-    fprintf(stderr, "[INFO] GHOST TOOK TURN\n");
+    // fprintf(stderr, "[INFO] GHOST TOOK TURN\n");
     if (ghost == NULL) {
         fprintf(stderr, "[ERROR] GHOST NULL\n");
         return;
@@ -103,7 +103,7 @@ void ghost_takeTurn(struct Ghost* ghost) {
     }
 
     if (!ghost->in_simulation) {
-        fprintf(stderr, "[INFO] GHOST NOT IN SIMULATION\n");
+        // fprintf(stderr, "[INFO] GHOST NOT IN SIMULATION\n");
         return;
     }
 
@@ -177,7 +177,7 @@ bool ghost_updateCheckBoredom(struct Ghost* ghost, int hunterCount) {
 }
 
 void* ghost_thread(void* arg) {
-    fprintf(stderr, "[INFO] GHOST THREAD STARTED\n");
+    // fprintf(stderr, "[INFO] GHOST THREAD STARTED\n");
     struct Ghost *ghost = arg;
     if (ghost == NULL) return NULL;
 

@@ -50,7 +50,7 @@ int hunter_gatherEvidence(struct Hunter* hunter) {
     }
 
     sem_post(&hunter->currentRoom->mutex);
-    fprintf(stderr, "[INFO] hunter_gatherEvidence: hunter did not find evidence\n");
+    // fprintf(stderr, "[INFO] hunter_gatherEvidence: hunter did not find evidence\n");
     return C_ERR_NO_EVIDENCE;
 }
 
@@ -70,14 +70,14 @@ void hunter_updateState(struct Hunter* hunter) {
     if (hunter->currentRoom->currentGhost != NULL) {
         hunter->boredom = 0;
         hunter->fear++;
-        fprintf(stderr, "[INFO] hunter (%d) state updated, ghost present\n", hunter->id);
+        // fprintf(stderr, "[INFO] hunter (%d) state updated, ghost present\n", hunter->id);
         sem_post(&hunter->currentRoom->mutex);
         return;
     }
     sem_post(&hunter->currentRoom->mutex);
 
     hunter->boredom++;
-    fprintf(stderr, "[INFO] hunter (%d) state updated, ghost not present\n", hunter->id);
+    // fprintf(stderr, "[INFO] hunter (%d) state updated, ghost not present\n", hunter->id);
 }
 
 void hunter_move(struct Hunter* hunter, struct Room* destinationRoom) { 
@@ -94,14 +94,14 @@ void hunter_move(struct Hunter* hunter, struct Room* destinationRoom) {
     }
 
     if (currentRoom == destinationRoom) {
-        fprintf(stderr, "[INFO] hunter_move: attempted to move to same room\n");
+        // fprintf(stderr, "[INFO] hunter_move: attempted to move to same room\n");
         return;
     }
 
     deadlock_lockRooms(currentRoom, destinationRoom);
 
     if (room_isFull(destinationRoom)) {
-        fprintf(stderr, "[INFO] hunter_move: destination room %s is full\n", destinationRoom->name);
+        // fprintf(stderr, "[INFO] hunter_move: destination room %s is full\n", destinationRoom->name);
         deadlock_unlockRooms(currentRoom, destinationRoom);
         return;
     }
@@ -254,13 +254,13 @@ void* hunter_thread(void* arg) {
     struct Hunter* hunter = (struct Hunter*)arg;
     if (hunter == NULL) return NULL;
 
-    fprintf(stderr, "[INFO] HUNTER THREAD STARTED: %s\n", hunter->name);
+    // fprintf(stderr, "[INFO] HUNTER THREAD STARTED: %s\n", hunter->name);
 
     while (!hunter->exitedSimulation) {
         hunter_takeTurn(hunter);
         usleep(rand_int_threadsafe(5000, 15000));
     }
     
-    fprintf(stderr, "[INFO] HUNTER THREAD ENDED: %s\n", hunter->name);
+    // fprintf(stderr, "[INFO] HUNTER THREAD ENDED: %s\n", hunter->name);
     return NULL;
 }

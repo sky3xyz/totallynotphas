@@ -17,7 +17,7 @@ void casefile_init(struct CaseFile* caseFile) {
         return;
     }
 
-    fprintf(stderr, "[INFO] casefile_init: casefile init success\n");
+    // // fprintf(stderr, "[INFO] casefile_init: casefile init success\n");
 }
 
 void casefile_addEvidence(struct CaseFile* caseFile, enum EvidenceType ev) {
@@ -41,6 +41,6 @@ void casefile_addEvidence(struct CaseFile* caseFile, enum EvidenceType ev) {
         return;
     }
 
-    fprintf(stderr, "[INFO] casefile_addEvidence: evidence successfully added");
+    // fprintf(stderr, "[INFO] casefile_addEvidence: evidence successfully added");
 }
 

@@ -18,9 +18,13 @@ int main() {
     const enum EvidenceType* all_ev = NULL;
     int ev_cnt = get_all_evidence_types(&all_ev);
     char name_input[MAX_HUNTER_NAME];
+    printf("========================================\n");
+    printf("Legally Distinct Ghost Hunting Game\n");
+    printf("Willow House Investigation\n");
+    printf("========================================\n");
 
     while (1) {
-        printf("Enter hunter name (or \"done\"): ");
+        printf("\nEnter hunter name (or \"done\"): ");
         fgets(name_input, sizeof(name_input), stdin);
         name_input[strcspn(name_input, "\n")] = '\0';
         
@@ -93,40 +97,45 @@ int createThreads(struct House* house, pthread_t* arr) {
 }
 
 void printResults(struct House* house) {
-    printf("\n\n\n");
-    printf("==========================\n");
-    printf("      RESULTS\n");
-    printf("==========================\n");
-    printf("\n");
-
-    // evidence
     const enum EvidenceType* all_ev = NULL;
     int ev_cnt = get_all_evidence_types(&all_ev);
     int collected_cnt = 0;
+    int goodHunter_cnt = 0;
 
-    printf("=== EVIDENCE COLLECTED ===\n");
-    for (int i = 0; i < ev_cnt; i++) {
-        if (evidence_has(house->caseFile.collected, all_ev[i])) {
-            printf("\t- %s\n", evidence_to_string(all_ev[i]));
-            collected_cnt++;
-        }
-    }
-    if (collected_cnt == 0) {
-        printf("\t- No Evidence Collected :(\n");
-    }
+    printf("\n\n\n");
+    printf("==============================\n");
+    printf("Investigation Results\n");
+    printf("==============================\n");
     printf("\n");
 
     // hunter statuses
     printf("=== HUNTER STATUS ===\n");
     for (int i = 0; i < house->hunters.contains; i++) {
         struct Hunter* hunter = &house->hunters.data[i];
-        printf("\t%-20s (ID: %d) exit reason: %s\n", hunter->name, hunter->id, exit_reason_to_string(hunter->exitReason));
-    }
+        if (hunter->exitReason == LR_EVIDENCE){
+            printf("\t- %s[\u2713]%s %s (ID: %d) exit reason: %s\n", "\x1b[32m", "\x1b[30m",hunter->name, hunter->id, exit_reason_to_string(hunter->exitReason));
+            goodHunter_cnt++;
+        }
 
+        else printf("\t- %s[X]%s %s (ID: %d) exit reason: %s\n", "\x1b[31m", "\x1b[30m",hunter->name, hunter->id, exit_reason_to_string(hunter->exitReason));
+    }
     printf("\n");
+
+    // evidence
+    printf("Shared Case File Checklist\n");
+    printf("=== EVIDENCE COLLECTED ===\n");
+    for (int i = 0; i < ev_cnt; i++) {
+        if (evidence_has(house->caseFile.collected, all_ev[i])) {
+            printf("\t- %s[\u2713]%s %s\n", "\x1b[32m", "\x1b[30m", evidence_to_string(all_ev[i]));
+            collected_cnt++;
+        } else {
+            printf("\t- %s[X]%s %s\n", "\x1b[31m", "\x1b[30m", evidence_to_string(all_ev[i]));
+        }
+    }
+    printf("\n");
+
     // ghost identitfication
-    printf("=== DID WE IDENTIFY THE GHOST ===\n");
-    printf("\tActual Ghost Type -> %s\n", ghost_to_string(house->ghost.type));
+    printf("=== VICTORY? ===\n");
 
     const enum GhostType* allGhosts = NULL;
     int ghost_cnt = get_all_ghost_types(&allGhosts);
@@ -140,12 +149,17 @@ void printResults(struct House* house) {
             }
         }
     }
-    printf("\tFound Ghost Type -> %s\n", foundGhost);
+    printf("Ghost Guess -> %s\n", foundGhost);
+    printf("Hunters that exited due to evidence -> %d\n", goodHunter_cnt);
+    printf("Actual Ghost Type -> %s\n", ghost_to_string(house->ghost.type));
 
+    printf("=== RESULT ===\n");
     if (house->caseFile.solved) {
-        printf("SUCCESS: Case solved!\n");
+        printf("%sSUCCESS%s: Case solved!\n", "\x1b[32m", "\x1b[30m");
+        printf("Hunters Win!\n");
     } else {
-        printf("FAILED: Not enough evidence found.\n");
+        printf("%sFAILED%s: Not enough evidence found.\n", "\x1b[31m", "\x1b[30m");
+        printf("Ghost Wins!\n");
     }
     printf("====\n");
 }

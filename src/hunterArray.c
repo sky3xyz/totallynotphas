@@ -19,7 +19,7 @@ int hunterArray_init(struct HunterArray *hunterArray) {
         return C_ERR_ENOMEM;
     }
     
-    fprintf(stderr, "[INFO] hunterArray_init: hunterArray init done\n");
+    // fprintf(stderr, "[INFO] hunterArray_init: hunterArray init done\n");
     return C_ERR_OK;
 }
 
@@ -52,7 +52,7 @@ int hunterArray_append(struct HunterArray* hunterArray, struct Hunter* hunter) {
     }
     hunterArray->data[hunterArray->contains] = *hunter;
     hunterArray->contains++;
-    fprintf(stderr, "[INFO] hunterArray_append: appended hunter\n");
+    // fprintf(stderr, "[INFO] hunterArray_append: appended hunter\n");
     return C_ERR_OK;
 }
 
@@ -80,7 +80,7 @@ int hunterArray_grow(struct HunterArray *hunterArray) {
     hunterArray->data = tmp;
     hunterArray->capacity = newCapacity;
 
-    fprintf(stderr, "[INFO] hunterArray_grow: hunterArray grew to %d\n", newCapacity);
+    // fprintf(stderr, "[INFO] hunterArray_grow: hunterArray grew to %d\n", newCapacity);
     return C_ERR_OK;
 }
 
@@ -95,6 +95,6 @@ int hunterArray_clear(struct HunterArray *hunterArray) {
     hunterArray->contains = 0;
     hunterArray->capacity = 0;
 
-    fprintf(stderr, "[INFO] hunterArray_clear: cleared hunterArray\n");
+    // fprintf(stderr, "[INFO] hunterArray_clear: cleared hunterArray\n");
     return C_ERR_OK;
 }
