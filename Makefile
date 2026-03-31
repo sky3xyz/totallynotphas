@@ -3,7 +3,7 @@ HEADERDIR := headers/
 CFLAGS ?= -I$(HEADERDIR) -Wall -Wextra -pthread
 
 LDFLAGS := 
-TARGET := totally_not_phasmophoiba
+TARGET := totally_not_phasmophoiba_TUI
 
 SRC_DIR := src
 SRCS := $(wildcard src/*.c)

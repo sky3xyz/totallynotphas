@@ -131,7 +131,6 @@ void hunter_move(struct Hunter* hunter, struct Room* destinationRoom) {
 }
 
 void hunter_equipmentSwap(struct Hunter* hunter) {
-    // rework logic here :3
     if (hunter == NULL) {
         fprintf(stderr, "[ERROR] hunter_equipmentSwap: hunter was NULL\n");
         return;

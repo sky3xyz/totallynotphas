@@ -153,7 +153,7 @@ void printResults(struct House* house) {
     printf("Hunters that exited due to evidence -> %d\n", goodHunter_cnt);
     printf("Actual Ghost Type -> %s\n", ghost_to_string(house->ghost.type));
 
-    printf("=== RESULT ===\n");
+    printf("\n\n=== RESULT ===\n");
     if (house->caseFile.solved) {
         printf("%sSUCCESS%s: Case solved!\n", "\x1b[32m", "\x1b[30m");
         printf("Hunters Win!\n");
