@@ -2,7 +2,7 @@ CC ?= gcc
 HEADERDIR := headers/
 CFLAGS ?= -I$(HEADERDIR) -Wall -Wextra -pthread
 
-LDFLAGS := 
+LDFLAGS :=
 TARGETS := totally_not_phasmophoiba multi_simulation
 
 SRC_DIR := src
