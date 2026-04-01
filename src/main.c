@@ -40,11 +40,11 @@ void printResults(struct House* house) {
     for (int i = 0; i < house->hunters.contains; i++) {
         struct Hunter* hunter = &house->hunters.data[i];
         if (hunter->exitReason == LR_EVIDENCE){
-            printf("\t- %s[\u2713]%s %s (ID: %d) exit reason: %s\n", "\x1b[32m", "\x1b[30m",hunter->name, hunter->id, exit_reason_to_string(hunter->exitReason));
+            printf("\t- %s[\u2713]%s %s (ID: %d) exit reason: %s\n", "\x1b[32m", "\x1b[0m",hunter->name, hunter->id, exit_reason_to_string(hunter->exitReason));
             goodHunter_cnt++;
         }
 
-        else printf("\t- %s[X]%s %s (ID: %d) exit reason: %s\n", "\x1b[31m", "\x1b[30m",hunter->name, hunter->id, exit_reason_to_string(hunter->exitReason));
+        else printf("\t- %s[X]%s %s (ID: %d) exit reason: %s\n", "\x1b[31m", "\x1b[0m",hunter->name, hunter->id, exit_reason_to_string(hunter->exitReason));
     }
     printf("\n");
 
@@ -53,10 +53,10 @@ void printResults(struct House* house) {
     printf("=== EVIDENCE COLLECTED ===\n");
     for (int i = 0; i < ev_cnt; i++) {
         if (evidence_has(house->caseFile.collected, all_ev[i])) {
-            printf("\t- %s[\u2713]%s %s\n", "\x1b[32m", "\x1b[30m", evidence_to_string(all_ev[i]));
+            printf("\t- %s[\u2713]%s %s\n", "\x1b[32m", "\x1b[0m", evidence_to_string(all_ev[i]));
             collected_cnt++;
         } else {
-            printf("\t- %s[X]%s %s\n", "\x1b[31m", "\x1b[30m", evidence_to_string(all_ev[i]));
+            printf("\t- %s[X]%s %s\n", "\x1b[31m", "\x1b[0m", evidence_to_string(all_ev[i]));
         }
     }
     printf("\n");
@@ -82,10 +82,10 @@ void printResults(struct House* house) {
 
     printf("\n\n=== RESULT ===\n");
     if (house->caseFile.solved) {
-        printf("%sSUCCESS%s: Case solved!\n", "\x1b[32m", "\x1b[30m");
+        printf("%sSUCCESS%s: Case solved!\n", "\x1b[32m", "\x1b[0m");
         printf("Hunters Win!\n");
     } else {
-        printf("%sFAILED%s: Not enough evidence found.\n", "\x1b[31m", "\x1b[30m");
+        printf("%sFAILED%s: Not enough evidence found.\n", "\x1b[31m", "\x1b[0m");
         printf("Ghost Wins!\n");
     }
     printf("====\n");
