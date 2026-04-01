@@ -175,7 +175,7 @@ int automated(char* argv[], int reportI) {
         char suffix[12];
 
         // itoa is not a function :(
-        sprintf(suffix, "%d", i);
+        snprintf(suffix, sizeof(suffix), "%d", i);
 
         enum EvidenceType initialDevice = all_ev[rand_int_threadsafe(0, ev_cnt)];
 
